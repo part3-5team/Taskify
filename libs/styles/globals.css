@@ -3,69 +3,69 @@
 @theme inline {
   --font-sans: var(--font-pretendard), ui-sans-serif, system-ui, sans-serif;
 
-  --text-xs-12-medium: 12px;
+  --text-xs-12-medium: 0.75rem; /* 12px */
   --text-xs-12-medium--font-weight: 500;
 
-  --text-xs-12-semibold: 12px;
+  --text-xs-12-semibold: 0.75rem; /* 12px */
   --text-xs-12-semibold--font-weight: 600;
 
-  --text-sm-13-medium: 13px;
+  --text-sm-13-medium: 0.8125rem; /* 13px */
   --text-sm-13-medium--font-weight: 500;
 
-  --text-sm-13-semibold: 13px;
+  --text-sm-13-semibold: 0.8125rem; /* 13px */
   --text-sm-13-semibold--font-weight: 600;
 
-  --text-md-14-medium: 14px;
+  --text-md-14-medium: 0.875rem; /* 14px */
   --text-md-14-medium--font-weight: 500;
 
-  --text-md-14-medium-150%: 14px;
+  --text-md-14-medium-150%: 0.875rem; /* 14px */
   --text-md-14-medium-150%--font-weight: 500;
   --text-md-14-medium-150%--line-height: 150%;
 
-  --text-lg-14-semibold: 14px;
+  --text-lg-14-semibold: 0.875rem; /* 14px */
   --text-lg-14-semibold--font-weight: 600;
 
-  --text-lg-14-bold: 14px;
+  --text-lg-14-bold: 0.875rem; /* 14px */
   --text-lg-14-bold--font-weight: 700;
 
-  --text-lg-16-medium: 16px;
+  --text-lg-16-medium: 1rem; /* 16px */
   --text-lg-16-medium--font-weight: 500;
 
-  --text-lg-16-medium-160%: 16px;
+  --text-lg-16-medium-160%: 1rem; /* 16px */
   --text-lg-16-medium-160%--font-weight: 500;
   --text-lg-16-medium-160%-line--height: 160%;
 
-  --text-lg-16-semibold: 16px;
+  --text-lg-16-semibold: 1rem; /* 16px */
   --text-lg-16-semibold--font-weight: 600;
 
-  --text-lg-16-bold: 16px;
+  --text-lg-16-bold: 1rem; /* 16px */
   --text-lg-16-bold--font-weight: 700;
 
-  --text-2lg-18-medium: 18px;
+  --text-2lg-18-medium: 1.125rem; /* 18px */
   --text-2lg-18-medium--font-weight: 500;
 
-  --text-xl-20-medium: 20px;
+  --text-xl-20-medium: 1.25rem; /* 20px */
   --text-xl-20-medium--font-weight: 500;
 
-  --text-xl-20-semibold: 20px;
+  --text-xl-20-semibold: 1.25rem; /* 20px */
   --text-xl-20-semibold--font-weight: 600;
 
-  --text-xl-20-bold: 20px;
+  --text-xl-20-bold: 1.25rem; /* 20px */
   --text-xl-20-bold--font-weight: 700;
 
-  --text-2xl-24-medium: 24px;
+  --text-2xl-24-medium: 1.5rem; /* 24px */
   --text-2xl-24-medium--font-weight: 500;
 
-  --text-2xl-24-semibold: 24px;
+  --text-2xl-24-semibold: 1.5rem; /* 24px */
   --text-2xl-24-semibold--font-weight: 600;
 
-  --text-2xl-24-bold: 24px;
+  --text-2xl-24-bold: 1.5rem; /* 24px */
   --text-2xl-24-bold--font-weight: 700;
 
-  --text-3xl-32-semibold: 32px;
+  --text-3xl-32-semibold: 2rem; /* 32px */
   --text-3xl-32-semibold--font-weight: 600;
 
-  --text-3xl-32-bold: 32px;
+  --text-3xl-32-bold: 2rem; /* 32px */
   --text-3xl-32-bold--font-weight: 700;
 
   /* BG */
