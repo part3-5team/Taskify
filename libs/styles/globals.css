@@ -1,8 +1,126 @@
 @import 'tailwindcss';
 
 @theme inline {
+  --font-sans: var(--font-pretendard), ui-sans-serif, system-ui, sans-serif;
+
+  --text-xs-12-medium: 12px;
+  --text-xs-12-medium--font-weight: 500;
+
+  --text-xs-12-semibold: 12px;
+  --text-xs-12-semibold--font-weight: 600;
+
+  --text-sm-13-medium: 13px;
+  --text-sm-13-medium--font-weight: 500;
+
+  --text-sm-13-semibold: 13px;
+  --text-sm-13-semibold--font-weight: 600;
+
+  --text-md-14-medium: 14px;
+  --text-md-14-medium--font-weight: 500;
+
+  --text-md-14-medium-150%: 14px;
+  --text-md-14-medium-150%--font-weight: 500;
+  --text-md-14-medium-150%--line-height: 150%;
+
+  --text-lg-14-semibold: 14px;
+  --text-lg-14-semibold--font-weight: 600;
+
+  --text-lg-14-bold: 14px;
+  --text-lg-14-bold--font-weight: 700;
+
+  --text-lg-16-medium: 16px;
+  --text-lg-16-medium--font-weight: 500;
+
+  --text-lg-16-medium-160%: 16px;
+  --text-lg-16-medium-160%--font-weight: 500;
+  --text-lg-16-medium-160%-line--height: 160%;
+
+  --text-lg-16-semibold: 16px;
+  --text-lg-16-semibold--font-weight: 600;
+
+  --text-lg-16-bold: 16px;
+  --text-lg-16-bold--font-weight: 700;
+
+  --text-2lg-18-medium: 18px;
+  --text-2lg-18-medium--font-weight: 500;
+
+  --text-xl-20-medium: 20px;
+  --text-xl-20-medium--font-weight: 500;
+
+  --text-xl-20-semibold: 20px;
+  --text-xl-20-semibold--font-weight: 600;
+
+  --text-xl-20-bold: 20px;
+  --text-xl-20-bold--font-weight: 700;
+
+  --text-2xl-24-medium: 24px;
+  --text-2xl-24-medium--font-weight: 500;
+
+  --text-2xl-24-semibold: 24px;
+  --text-2xl-24-semibold--font-weight: 600;
+
+  --text-2xl-24-bold: 24px;
+  --text-2xl-24-bold--font-weight: 700;
+
+  --text-3xl-32-semibold: 32px;
+  --text-3xl-32-semibold--font-weight: 600;
+
+  --text-3xl-32-bold: 32px;
+  --text-3xl-32-bold--font-weight: 700;
+
+  /* BG */
+  --color-stroke: rgb(103, 105, 117);
+  --color-modal: rgb(36, 36, 41);
+  --color-bg: rgb(27, 26, 31);
+
+  /* black */
+  --color-black-100: rgb(75, 75, 75);
+  --color-black-200: rgb(51, 50, 54);
+  --color-black-300: rgb(38, 38, 41);
+  --color-black-400: rgb(32, 31, 35);
+  --color-black-500: rgb(19, 18, 21);
+  --color-black-600: rgb(0, 0, 0);
+
+  /* gray */
+  --color-gray-100: rgb(248, 247, 250);
+  --color-gray-200: rgb(236, 236, 238);
+  --color-gray-300: rgb(214, 213, 217);
+  --color-gray-400: rgb(163, 159, 178);
+  --color-gray-500: rgb(120, 116, 134);
+  --color-gray-600: rgb(91, 89, 99);
+  --color-gray-700: rgb(82, 79, 91);
+  --color-gray-800: rgb(73, 71, 79);
+  --color-gray-900: rgb(60, 60, 65);
+
+  /* brand */
+  --color-brand-100: rgb(207, 248, 210);
+  --color-brand-200: rgb(166, 235, 170);
+  --color-brand-300: rgb(107, 218, 113);
+  --color-brand-400: rgb(63, 192, 63);
+  --color-brand-500: rgb(0, 162, 0);
+  --color-brand-600: rgb(11, 138, 11);
+  --color-brand-700: rgb(13, 121, 16);
+  --color-brand-800: rgb(16, 103, 31);
+  --color-brand-900: rgb(0, 73, 12);
+  --color-brand-950: rgb(0, 51, 13);
+
+  /* red */
+  --color-red-500: rgb(202, 55, 43);
+
+  /* blue */
+  --color-blue-200: rgb(118, 165, 234);
+  --color-blue-500: rgb(20, 88, 188);
+
+  /* profile random */
+  --color-profile-green: rgb(32, 110, 78);
+  --color-profile-violet: rgb(89, 62, 165);
+  --color-profile-cyan: rgb(31, 106, 131);
+  --color-profile-rose: rgb(174, 46, 36);
+  --color-profile-blue: rgb(20, 88, 188);
+  --color-profile-yellow: rgb(189, 140, 0);
+  --color-profile-orange: rgb(159, 75, 0);
 }
 
 body {
-  font-family: sans-serif;
+  font-family: var(--font-sans), sans-serif;
 }
