@@ -78,6 +78,7 @@ export default function Comment({
               placeholder="댓글을 남겨보세요"
               disabled={disabled}
               onChange={(e) => setValue(e.target.value)}
+              autoFocus
               className="h-[72px] md:h-[96px] border-0 bg-transparent px-0 py-0 focus:border-0"
             />
 
