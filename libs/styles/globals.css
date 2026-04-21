@@ -44,6 +44,12 @@
   --text-2lg-18-medium: 1.125rem; /* 18px */
   --text-2lg-18-medium--font-weight: 500;
 
+  --text-2lg-18-semibold: 1.125rem; /* 18px */
+  --text-2lg-18-semibold--font-weight: 600;
+
+  --text-2lg-18-bold: 1.125rem; /* 18px */
+  --text-2lg-18-bold--font-weight: 700;
+
   --text-xl-20-medium: 1.25rem; /* 20px */
   --text-xl-20-medium--font-weight: 500;
 
@@ -123,4 +129,5 @@
 
 body {
   font-family: var(--font-sans);
+  line-height: 100%;
 }
