@@ -6,6 +6,7 @@ export default function LandingFooter() {
   return (
     <div className="bg-bg space-y-5 px-7.5 py-3.5">
       <div className="py-1">
+        {/* @TODO 로고로 바꾸기 */}
         <span className="text-white">로고</span>
       </div>
 
