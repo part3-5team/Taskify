@@ -22,6 +22,26 @@ const IMG_CONFIG = [
   },
 ]
 
+const Feature3Img = ({
+  img,
+  label,
+  desc,
+}: {
+  img: StaticImageData
+  label: string
+  desc: string
+}) => {
+  return (
+    <div className="space-y-5">
+      <Image src={img} alt="" priority />
+      <div className="space-y-3">
+        <h2 className="text-lg-16-bold text-gray-100">{label}</h2>
+        <p className="text-md-14-medium text-gray-400">{desc}</p>
+      </div>
+    </div>
+  )
+}
+
 export default function LandingFeature3({ className }: { className?: string }) {
   return (
     <div className={className}>
@@ -47,26 +67,6 @@ export default function LandingFeature3({ className }: { className?: string }) {
       {IMG_CONFIG.map(({ img, label, desc }) => (
         <Feature3Img key={label} img={img} label={label} desc={desc} />
       ))}
-    </div>
-  )
-}
-
-const Feature3Img = ({
-  img,
-  label,
-  desc,
-}: {
-  img: StaticImageData
-  label: string
-  desc: string
-}) => {
-  return (
-    <div className="space-y-5">
-      <Image src={img} alt="" priority />
-      <div className="space-y-3">
-        <h2 className="text-lg-16-bold text-gray-100">{label}</h2>
-        <p className="text-md-14-medium text-gray-400">{desc}</p>
-      </div>
     </div>
   )
 }
