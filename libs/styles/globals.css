@@ -43,6 +43,9 @@
 
   --text-2lg-18-medium: 1.125rem; /* 18px */
   --text-2lg-18-medium--font-weight: 500;
+  
+  --text-2lg-18-semibold: 1.125rem; /* 18px */
+  --text-2lg-18-semibold--font-weight: 600; 
 
   --text-2lg-18-semibold: 1.125rem; /* 18px */
   --text-2lg-18-semibold--font-weight: 600;
