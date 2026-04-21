@@ -21,7 +21,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko" className={`${pretendard.variable} antialiased`}>
+    <html
+      lang="ko"
+      data-scroll-behavior="smooth"
+      className={`${pretendard.variable} antialiased`}
+    >
       <body>{children}</body>
     </html>
   )

@@ -129,4 +129,5 @@
 
 body {
   font-family: var(--font-sans);
+  line-height: 100%;
 }
