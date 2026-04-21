@@ -2,10 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Logo from '@/assets/imgs/img_Logo.svg'
 import HashIcon from '@/assets/icons/ic_hash.svg'
-import PlusIcon from '@/assets/icons/ic_plus.svg'
-import SettingIcon from '@/assets/icons/ic_setting.svg'
 
 interface NavItem {
   label: string
@@ -36,34 +33,13 @@ const NAV_ITEMS: NavItem[] = [
   { label: '릴리즈 노트', href: '/dashboard/17' },
 ]
 
-export default function SideMenu() {
+export default function DashboardList() {
   const [page, setPage] = useState(1)
   const totalPages = Math.ceil(NAV_ITEMS.length / ITEMS_PER_PAGE)
   const pagedItems = NAV_ITEMS.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
   return (
-    <aside className="flex flex-col w-[300px] min-h-screen border-r border-gray-900 bg-black-500 py-2">
-      {/* 로고 부분 */}
-      <div className="px-1 pb-1 border-gray-900">
-        <Link href="/mydashboard">
-          <Logo className="w-40 h-15" />
-        </Link>
-      </div>
-
-      {/* 대시보드 목록 헤더 (대시보드 추가 +) */}
-      <div className="flex items-center justify-between px-6 pb-1">
-        <span className="text-sm-13-semibold text-gray-400">
-          대시보드 추가
-        </span>
-        <button
-          type="button"
-          aria-label="대시보드 추가"
-          className="flex items-center justify-center text-gray-400 hover:text-gray-100 bg-transparent border-none cursor-pointer"
-        >
-          <PlusIcon className="w-5 h-5 text-gray-400" />
-        </button>
-      </div>
-
+    <>
       {/* 네비게이션 */}
       <nav className="flex-1 mt-1">
         <ul className="list-none m-0 p-0">
@@ -100,23 +76,6 @@ export default function SideMenu() {
           다음 &gt;
         </button>
       </div>
-
-      {/* 하단 프로필 */}
-      <div className="border-t border-gray-900 px-5 py-4 flex items-center gap-3">
-        {/* 임시 프로필 이미지 */}
-        <div className="w-8 h-8 rounded-full bg-gray-700 shrink-0" />
-        <span className="flex-1 text-md-14-medium text-gray-100">
-          프로필 이름
-        </span>
-        {/* 설정 아이콘 */}
-        <button
-          type="button"
-          aria-label="설정"
-          className="flex items-center justify-center text-gray-400 hover:text-gray-100 bg-transparent border-none cursor-pointer shrink-0"
-        >
-          <SettingIcon className="w-5 h-5" />
-        </button>
-      </div>
-    </aside>
+    </>
   )
 }

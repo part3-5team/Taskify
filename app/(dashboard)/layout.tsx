@@ -1,4 +1,4 @@
-import SideMenu from '@/components/common/SideMenu/SideMenu'
+import SideMenu from '@/components/dashboard/SideMenu'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
