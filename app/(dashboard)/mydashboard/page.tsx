@@ -1,17 +1,12 @@
+import DashboardInvitationContainer from '@/components/mydashboard/DashboardInvitationContainer'
+import MyDashboardContainer from '@/components/mydashboard/MyDashboardContainer'
+
 export default function MyDashboardPage() {
   return (
-    <div>
-      <h1>홈</h1>
-      <div>
-        <div>
-          <h1>내 대시보드</h1>
-          <div>대시보드가 없습니다.</div>
-        </div>
-        <div>
-          <h1>초대받은 대시보드</h1>
-          <div>아직 초대받은 대시보드가 없습니다.</div>
-        </div>
-      </div>
+    <div className="bg-black-400 min-h-screen w-full text-gray-100">
+      <h1 className="text-3xl-32-bold w-full px-12 pt-6 pb-4 leading-19">홈</h1>
+      <MyDashboardContainer />
+      <DashboardInvitationContainer />
     </div>
   )
 }

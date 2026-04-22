@@ -1,0 +1,7 @@
+export default function MyDashboardList() {
+  return (
+    <div className="bg-black-400 text-2lg-18-bold flex flex-col items-center justify-center gap-2.5 rounded-[30px] border-1 border-gray-700 py-10">
+      대시보드가 없습니다.
+    </div>
+  )
+}
