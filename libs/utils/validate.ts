@@ -4,6 +4,13 @@ export const validateEmail = (email: string) => {
   return re.test(String(email).toLowerCase())
 }
 
-export const validatePassword = (password: string) => {
-  return password.length >= 8
-}
+export const validateNickname = (nickname: string) => nickname.length > 0
+
+export const validatePassword = (password: string) => password.length >= 8
+
+export const validatePasswordCheck = (
+  password: string,
+  passwordCheck: string,
+) => password === passwordCheck
+
+export const validateAgreement = (agreement: boolean) => agreement
