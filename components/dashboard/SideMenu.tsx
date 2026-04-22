@@ -1,16 +1,14 @@
-import Logo from '@/components/common/Logo'
-import DashboardSelector from '@/components/dashboard/DashboardSelector'
-import DashboardList from '@/components/dashboard/DashboardList'
-import ProfileImageSection from '@/components/profile/ProfileImageSection'
+import SidebarHeader from '@/components/dashboard/SidebarHeader'
+import SidebarDashboardList from '@/components/dashboard/SidebarDashboardList'
+import SidebarFooter from '@/components/dashboard/SidebarFooter'
 
 export default function SideMenu() {
   return (
-    <aside className="flex flex-col w-[300px] min-h-screen border-r border-gray-900 bg-black-500 py-2">
-      <Logo />
-      <DashboardSelector />
-      <DashboardList />
+    <aside className="bg-black-500 flex min-h-screen w-[300px] flex-col border-r border-gray-900 py-2">
+      <SidebarHeader />
+      <SidebarDashboardList />
       <div className="mt-auto">
-        <ProfileImageSection />
+        <SidebarFooter />
       </div>
     </aside>
   )

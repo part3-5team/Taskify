@@ -1,6 +1,6 @@
 import SettingIcon from '@/assets/icons/ic_setting.svg'
 
-export default function ProfileImageSection() {
+export default function SidebarFooter() {
   return (
     <div className="border-t border-gray-900 px-5 py-4 flex items-center gap-3">
       {/* 임시 프로필 이미지 */}
