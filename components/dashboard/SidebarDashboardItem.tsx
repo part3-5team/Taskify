@@ -6,7 +6,10 @@ interface SidebarDashboardItemProps {
   href: string
 }
 
-export default function SidebarDashboardItem({ label, href }: SidebarDashboardItemProps) {
+export default function SidebarDashboardItem({
+  label,
+  href,
+}: SidebarDashboardItemProps) {
   return (
     <li className="mb-1">
       <Link

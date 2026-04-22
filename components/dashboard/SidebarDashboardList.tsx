@@ -46,7 +46,11 @@ export default function SidebarDashboardList() {
       <nav className="mt-1 flex-1">
         <ul className="m-0 list-none p-0">
           {pagedItems.map((item, index) => (
-            <SidebarDashboardItem key={index} label={item.label} href={item.href} />
+            <SidebarDashboardItem
+              key={index}
+              label={item.label}
+              href={item.href}
+            />
           ))}
         </ul>
       </nav>
