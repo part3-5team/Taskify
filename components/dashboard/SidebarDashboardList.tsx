@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import HashIcon from '@/assets/icons/ic_hash.svg'
+import SidebarDashboardItem from './SidebarDashboardItem'
 
 interface NavItem {
   label: string
@@ -33,37 +32,36 @@ const NAV_ITEMS: NavItem[] = [
   { label: '릴리즈 노트', href: '/dashboard/17' },
 ]
 
-export default function DashboardList() {
+export default function SidebarDashboardList() {
   const [page, setPage] = useState(1)
   const totalPages = Math.ceil(NAV_ITEMS.length / ITEMS_PER_PAGE)
-  const pagedItems = NAV_ITEMS.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  const pagedItems = NAV_ITEMS.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE,
+  )
 
   return (
     <>
       {/* 네비게이션 */}
-      <nav className="flex-1 mt-1">
-        <ul className="list-none m-0 p-0">
+      <nav className="mt-1 flex-1">
+        <ul className="m-0 list-none p-0">
           {pagedItems.map((item, index) => (
-            <li key={index} className="mb-1">
-              <Link
-                href={item.href}
-                className="flex items-center gap-2 px-6 py-2.5 text-md-14-medium text-gray-100 no-underline hover:bg-black-300 hover:text-gray-100"
-              >
-                <HashIcon className="w-5 h-5 shrink-0" />
-                {item.label}
-              </Link>
-            </li>
+            <SidebarDashboardItem
+              key={index}
+              label={item.label}
+              href={item.href}
+            />
           ))}
         </ul>
       </nav>
 
       {/* 페이지네이션 */}
-      <div className="flex items-center justify-between px-6 py-4 text-xs-12-medium text-gray-400">
+      <div className="text-xs-12-medium flex items-center justify-between px-6 py-4 text-gray-400">
         <button
           type="button"
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page === 1}
-          className="bg-transparent border-none cursor-pointer text-gray-400 hover:text-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="cursor-pointer border-none bg-transparent text-gray-400 hover:text-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
         >
           &lt; 이전
         </button>
@@ -71,7 +69,7 @@ export default function DashboardList() {
           type="button"
           onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           disabled={page === totalPages}
-          className="bg-transparent border-none cursor-pointer text-gray-400 hover:text-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="cursor-pointer border-none bg-transparent text-gray-400 hover:text-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
         >
           다음 &gt;
         </button>
