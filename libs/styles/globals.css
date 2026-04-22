@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 
 @theme inline {
+  --spacing: 0.25rem;
+
   --font-sans: var(--font-pretendard), ui-sans-serif, system-ui, sans-serif;
 
   --text-xs-12-medium: 0.75rem; /* 12px */
@@ -33,7 +35,7 @@
 
   --text-lg-16-medium-160%: 1rem; /* 16px */
   --text-lg-16-medium-160%--font-weight: 500;
-  --text-lg-16-medium-160%-line--height: 160%;
+  --text-lg-16-medium-160%--line--height: 160%;
 
   --text-lg-16-semibold: 1rem; /* 16px */
   --text-lg-16-semibold--font-weight: 600;
@@ -43,9 +45,9 @@
 
   --text-2lg-18-medium: 1.125rem; /* 18px */
   --text-2lg-18-medium--font-weight: 500;
-  
+
   --text-2lg-18-semibold: 1.125rem; /* 18px */
-  --text-2lg-18-semibold--font-weight: 600; 
+  --text-2lg-18-semibold--font-weight: 600;
 
   --text-2lg-18-semibold: 1.125rem; /* 18px */
   --text-2lg-18-semibold--font-weight: 600;
