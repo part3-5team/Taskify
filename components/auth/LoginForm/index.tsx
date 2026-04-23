@@ -3,19 +3,25 @@
 import Input from '@/components/common/input'
 import Button from '@/components/common/button'
 import useLoginForm from '@/hooks/useLoginForm'
+import OpenEyeIcon from '@/assets/icons/ic_visibility_on.svg'
+import CloseEyeIcon from '@/assets/icons/ic_visibility_off.svg'
 
 export default function LoginForm() {
   const {
     email,
     password,
+    isPasswordVisible,
     setEmail,
     setPassword,
+    togglePasswordVisibility,
     handleEmailBlur,
     handlePasswordBlur,
     emailError,
     passwordError,
     isFormValid,
   } = useLoginForm()
+
+  const PasswordIcon = isPasswordVisible ? OpenEyeIcon : CloseEyeIcon
 
   return (
     <form action="" className="text-white" onSubmit={(e) => e.preventDefault()}>
@@ -40,7 +46,7 @@ export default function LoginForm() {
       <div className="mb-7.5 flex w-full flex-col gap-3">
         <label htmlFor="password">비밀번호</label>
         <Input
-          type="password"
+          type={isPasswordVisible ? 'text' : 'password'}
           id="password"
           name="password"
           value={password}
@@ -56,7 +62,16 @@ export default function LoginForm() {
           }
           errorMessage={passwordError}
           className="py-3.5"
-        />
+        >
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            aria-label={isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'}
+            className="flex items-center"
+          >
+            <PasswordIcon className="size-6" />
+          </button>
+        </Input>
       </div>
 
       <div>

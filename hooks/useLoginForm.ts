@@ -8,6 +8,8 @@ export default function useLoginForm() {
   const [emailTouched, setEmailTouched] = useState(false)
   const [passwordTouched, setPasswordTouched] = useState(false)
 
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
+
   const isEmailValid = validateEmail(email)
   const isPasswordValid = validatePassword(password)
 
@@ -19,8 +21,10 @@ export default function useLoginForm() {
   return {
     email,
     password,
+    isPasswordVisible,
     setEmail,
     setPassword,
+    togglePasswordVisibility: () => setIsPasswordVisible((prev) => !prev),
     handleEmailBlur: () => setEmailTouched(true),
     handlePasswordBlur: () => setPasswordTouched(true),
     emailError: emailError ? '올바른 이메일 형식이 아닙니다.' : '',
