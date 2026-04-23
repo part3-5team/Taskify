@@ -24,7 +24,7 @@ export default function LandingHero({ className }: { className?: string }) {
         <h1 className="text-3xl-32-bold text-brand-400">TASKIFY</h1>
       </div>
 
-      <div className="flex gap-3">
+      <div className="mx-auto flex max-w-[315px] gap-3">
         {BUTTON_CONFIG.map(({ href, text, className }) => (
           <Link
             key={href}

@@ -2,9 +2,9 @@ import MsgIcon from '@/assets/icons/ic_email.svg'
 import FacebookIcon from '@/assets/icons/ic_facebook.svg'
 import InstaIcon from '@/assets/icons/ic_instagram.svg'
 
-export default function LandingFooter() {
+export default function LandingFooter({ className }: { className?: string }) {
   return (
-    <div className="bg-bg space-y-5 px-7.5 py-3.5">
+    <footer className={className}>
       <div className="py-1">
         {/* @TODO 로고로 바꾸기 */}
         <span className="text-white">로고</span>
@@ -20,6 +20,6 @@ export default function LandingFooter() {
         <FacebookIcon className="size-5" />
         <InstaIcon className="size-5" />
       </div>
-    </div>
+    </footer>
   )
 }
