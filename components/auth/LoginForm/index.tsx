@@ -33,7 +33,7 @@ export default function LoginForm() {
             emailError ? 'error' : email.length > 0 ? 'completed' : 'default'
           }
           errorMessage={emailError}
-          className="py-2.5"
+          className="py-3.5"
         />
       </div>
 
@@ -55,7 +55,7 @@ export default function LoginForm() {
                 : 'default'
           }
           errorMessage={passwordError}
-          className="py-2.5"
+          className="py-3.5"
         />
       </div>
 
