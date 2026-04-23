@@ -12,7 +12,7 @@ export default function LandingDesc({
   description,
 }: LandingDescProps) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 lg:pt-20">
       <LandingPoint number={number} />
 
       <h2 className="text-2xl-24-bold leading-7 break-keep text-gray-100 md:leading-8">
