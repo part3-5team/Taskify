@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import Input from '@/components/common/input'
 import IconClose from '@/assets/icons/ic_X.svg'
-import Button from '../common/button'
+import Button from '@/components/common/button'
 import ColorOption from '@/components/mydashboard/ColorOption'
 import { ColorType } from '@/components/mydashboard/ColorOption'
 
