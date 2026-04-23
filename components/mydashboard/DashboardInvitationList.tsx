@@ -6,7 +6,7 @@ export default function DashboardInvitationList() {
         <p className="flex-2 justify-center text-gray-400">초대자</p>
         <p className="flex-2 justify-center text-gray-400">수락 여부</p>
       </div>
-      <div className="border-black-200 flex items-center border-b px-7.5 py-3.5 text-gray-100">
+      <div className="border-black-200 hover:bg-black-300 flex items-center border-b px-7.5 py-3.5 text-gray-100">
         <p className="flex-6">대시보드</p>
         <p className="flex-2">김할일</p>
         <div className="text-lg-16-semibold flex flex-2 gap-2 text-white">
