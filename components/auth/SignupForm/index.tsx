@@ -98,7 +98,6 @@ export default function SignupForm() {
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            aria-label={isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'}
             className="flex items-center"
           >
             <PasswordIcon className="size-6" />
@@ -129,9 +128,6 @@ export default function SignupForm() {
           <button
             type="button"
             onClick={togglePasswordCheckVisibility}
-            aria-label={
-              isPasswordCheckVisible ? '비밀번호 숨기기' : '비밀번호 보기'
-            }
             className="flex items-center"
           >
             <PasswordCheckIcon className="size-6" />
