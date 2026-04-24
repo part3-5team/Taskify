@@ -1,10 +1,19 @@
 'use client'
 
-import Input from '@/components/common/input'
-import Button from '@/components/common/button'
-import useLoginForm from '@/hooks/useLoginForm'
+import { useActionState, useState } from 'react'
+import { login } from '@/libs/api/auth'
 import OpenEyeIcon from '@/assets/icons/ic_visibility_on.svg'
 import CloseEyeIcon from '@/assets/icons/ic_visibility_off.svg'
+import useLoginForm from '@/hooks/useLoginForm'
+import { LoginState } from '@/libs/types/Auth'
+import Input from '@/components/common/input'
+import Button from '@/components/common/button'
+import AuthModal from '../AuthModal'
+
+const initialState: LoginState = {
+  success: true,
+  message: '',
+}
 
 export default function LoginForm() {
   const {
@@ -23,8 +32,17 @@ export default function LoginForm() {
 
   const PasswordIcon = isPasswordVisible ? OpenEyeIcon : CloseEyeIcon
 
+  const [state, formAction, isPending] = useActionState(login, initialState)
+  const [dismissedState, setDismissedState] = useState<LoginState | null>(null)
+  const shouldShowErrorModal =
+    !!state?.message && !state.success && state !== dismissedState
+
+  const handleModalClose = () => {
+    setDismissedState(state)
+  }
+
   return (
-    <form action="" className="text-white" onSubmit={(e) => e.preventDefault()}>
+    <form action={formAction} className="text-white">
       <div className="mb-7.5 flex w-full flex-col gap-3">
         <label htmlFor="email">이메일</label>
         <Input
@@ -66,7 +84,6 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            aria-label={isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 보기'}
             className="flex items-center"
           >
             <PasswordIcon className="size-6" />
@@ -75,10 +92,14 @@ export default function LoginForm() {
       </div>
 
       <div>
-        <Button className="w-full" disabled={!isFormValid}>
+        <Button className="w-full" disabled={!isFormValid || isPending}>
           로그인
         </Button>
       </div>
+
+      {shouldShowErrorModal && (
+        <AuthModal state={state} onClick={handleModalClose} />
+      )}
     </form>
   )
 }
