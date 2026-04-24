@@ -21,7 +21,7 @@ export default function PopdoverMenu() {
   const handleDeleteClick = () => console.log('삭제 클릭')
 
   return (
-    <div className="bg-bg w-32 space-y-2.5 rounded-xl px-2.5 py-3">
+    <div className="bg-bg bg-black-300 w-32 space-y-2.5 rounded-xl px-2.5 py-3">
       <Button className="text-white" onClick={handleEditClick}>
         <IconEdit className="size-5" />
         <span>수정하기</span>
