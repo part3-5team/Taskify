@@ -1,18 +1,24 @@
 'use client'
 
 import React from 'react'
+import { useDroppable } from '@dnd-kit/core'
 import IconPlus from '@/assets/icons/ic_plus.svg'
 import IconSetting from '@/assets/icons/ic_setting.svg'
 import PopdoverMenu from '@/components/common/PopdoverMenu/index'
 
 interface ColumnProps {
+  id: string
   title: string
   children?: React.ReactNode
 }
 
-export default function Column({ title, children }: ColumnProps) {
+export default function Column({ id, title, children }: ColumnProps) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const toggleMenu = () => setIsMenuOpen((prev) => !prev)
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: id,
+  })
 
   return (
     <div className="flex h-full w-[350px] flex-shrink-0 flex-col">
@@ -58,7 +64,12 @@ export default function Column({ title, children }: ColumnProps) {
       <div className="px-5 pb-4">{/* 카드 */}</div>
 
       {/* 3. 카드가 들어갈 영역 (스크롤 가능) */}
-      <div className="flex flex-col gap-3 overflow-y-auto px-5 pb-5">
+      <div
+        ref={setNodeRef}
+        className={`flex h-full flex-col gap-3 overflow-y-auto px-5 pb-5 ${
+          isOver ? 'bg-black-300 rounded-lg transition-colors' : ''
+        }`}
+      >
         {children}
       </div>
     </div>
