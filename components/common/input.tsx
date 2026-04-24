@@ -54,10 +54,10 @@ export default function Input({
           disabled={disabled}
           {...props}
         />
-
+ 
         {children && (
           <div className={`
-            absolute right-4 flex items-center
+            absolute
             ${childrenPosition === "left" ? "left-4" : "right-4"}
           `}>
             {children}

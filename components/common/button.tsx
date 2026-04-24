@@ -24,11 +24,11 @@ const defaultButton: Record<ButtonVariant, boolean> = {
 
 const sizeStyle: Record<ButtonSize, string> = {
   sm: "px-4 py-[8.5px] text-lg-16-semibold",
-  md: "px-14 py-[15px] md:px-[114px] md:py-[19px] text-2lg-18-semibold",
+  md: "px-16 py-[20px] md:px-[90px] md:py-[19px] text-2lg-18-semibold",
   lg: "px-[140px] py-[19px]  md:px-[236px] md:py-[20px] text-2lg-18-semibold",
 }
 
-const baseStyle = "rounded-[180px]";
+const baseStyle = "rounded-[180px] hover:cursor-pointer";
 
 const variantStyle: Record<ButtonVariant, string> = {
   primary: "bg-brand-500 text-white hover:bg-brand-600 disabled:bg-brand-800 disabled:text-brand-950 disabled:cursor-not-allowed",
@@ -49,6 +49,7 @@ export default function Button({
 
   return (
     <button
+      type="button"
       className={`${baseStyle} ${variantStyle[variant]} ${sizeStyle[size]} ${className}`}
       disabled={isDisabled}
       onClick={onClick}
