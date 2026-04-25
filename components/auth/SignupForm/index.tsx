@@ -57,7 +57,7 @@ export default function SignupForm() {
   }
 
   return (
-    <form action={formAction} className="text-white">
+    <form action={formAction} className="text-lg-16-medium text-white">
       <div className="mb-7.5 flex w-full flex-col gap-3">
         <label htmlFor="email">이메일</label>
         <Input
