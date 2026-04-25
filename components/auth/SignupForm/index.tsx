@@ -1,14 +1,25 @@
 'use client'
 
-import Button from '@/components/common/button'
-import Input from '@/components/common/input'
+import { useActionState, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import OpenEyeIcon from '@/assets/icons/ic_visibility_on.svg'
 import CloseEyeIcon from '@/assets/icons/ic_visibility_off.svg'
 import CheckBoxIcon from '@/assets/icons/ic_check_on.svg'
 import UnCheckBoxIcon from '@/assets/icons/ic_check_off.svg'
-import useSignupForm from '@/hooks/useSignupForm'
+import { signup } from '@/libs/api/auth'
+import { AuthState } from '@/libs/types/Auth'
+import useSignupForm from '@/libs/hooks/useSignupForm'
+import Button from '@/components/common/button'
+import Input from '@/components/common/input'
+import AuthModal from '../AuthModal'
+
+const initialState: AuthState = {
+  success: true,
+  message: '',
+}
 
 export default function SignupForm() {
+  const router = useRouter()
   const {
     email,
     nickname,
@@ -32,9 +43,21 @@ export default function SignupForm() {
   const PasswordIcon = isPasswordVisible ? OpenEyeIcon : CloseEyeIcon
   const PasswordCheckIcon = isPasswordCheckVisible ? OpenEyeIcon : CloseEyeIcon
   const AgreementCheckIcon = isAgreement ? CheckBoxIcon : UnCheckBoxIcon
+  const [state, formAction, isPending] = useActionState(signup, initialState)
+  const [dismissedState, setDismissedState] = useState<AuthState | null>(null)
+  const shouldShowResultModal = !!state?.message && state !== dismissedState
+
+  const handleModalClose = () => {
+    if (state.success) {
+      router.push('/login')
+      return
+    }
+
+    setDismissedState(state)
+  }
 
   return (
-    <form action="" className="text-white" onSubmit={(e) => e.preventDefault()}>
+    <form action={formAction} className="text-white">
       <div className="mb-7.5 flex w-full flex-col gap-3">
         <label htmlFor="email">이메일</label>
         <Input
@@ -71,6 +94,7 @@ export default function SignupForm() {
           }
           errorMessage={errors.nickname}
           placeholder="닉네임을 입력해주세요"
+          maxLength={10}
           className="py-3.5"
         />
       </div>
@@ -93,6 +117,7 @@ export default function SignupForm() {
           }
           errorMessage={errors.password}
           placeholder="비밀번호를 입력해주세요"
+          minLength={8}
           className="py-3.5"
         >
           <button
@@ -123,6 +148,7 @@ export default function SignupForm() {
           }
           errorMessage={errors.passwordCheck}
           placeholder="비밀번호를 한 번 더 입력해주세요"
+          minLength={8}
           className="py-3.5"
         >
           <button
@@ -144,10 +170,14 @@ export default function SignupForm() {
       </div>
 
       <div>
-        <Button className="w-full" disabled={!isFormValid}>
+        <Button className="w-full" disabled={!isFormValid || isPending}>
           회원가입
         </Button>
       </div>
+
+      {shouldShowResultModal && (
+        <AuthModal state={state} onClick={handleModalClose} />
+      )}
     </form>
   )
 }

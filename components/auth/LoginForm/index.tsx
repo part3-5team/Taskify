@@ -4,13 +4,13 @@ import { useActionState, useState } from 'react'
 import { login } from '@/libs/api/auth'
 import OpenEyeIcon from '@/assets/icons/ic_visibility_on.svg'
 import CloseEyeIcon from '@/assets/icons/ic_visibility_off.svg'
-import useLoginForm from '@/hooks/useLoginForm'
-import { LoginState } from '@/libs/types/Auth'
+import { AuthState } from '@/libs/types/Auth'
+import useLoginForm from '@/libs/hooks/useLoginForm'
 import Input from '@/components/common/input'
 import Button from '@/components/common/button'
 import AuthModal from '../AuthModal'
 
-const initialState: LoginState = {
+const initialState: AuthState = {
   success: true,
   message: '',
 }
@@ -33,7 +33,7 @@ export default function LoginForm() {
   const PasswordIcon = isPasswordVisible ? OpenEyeIcon : CloseEyeIcon
 
   const [state, formAction, isPending] = useActionState(login, initialState)
-  const [dismissedState, setDismissedState] = useState<LoginState | null>(null)
+  const [dismissedState, setDismissedState] = useState<AuthState | null>(null)
   const shouldShowErrorModal =
     !!state?.message && !state.success && state !== dismissedState
 
