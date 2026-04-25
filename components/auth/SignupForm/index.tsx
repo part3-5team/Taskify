@@ -170,7 +170,11 @@ export default function SignupForm() {
       </div>
 
       <div>
-        <Button className="w-full" disabled={!isFormValid || isPending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={!isFormValid || isPending}
+        >
           회원가입
         </Button>
       </div>

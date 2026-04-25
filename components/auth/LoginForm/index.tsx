@@ -92,7 +92,11 @@ export default function LoginForm() {
       </div>
 
       <div>
-        <Button className="w-full" disabled={!isFormValid || isPending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={!isFormValid || isPending}
+        >
           로그인
         </Button>
       </div>
