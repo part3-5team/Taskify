@@ -1,9 +1,9 @@
-import { LoginState } from '@/libs/types/Auth'
+import { AuthState } from '@/libs/types/Auth'
 import Button from '@/components/common/button'
 import ModalLayout from '@/components/common/modal/ModalLayout'
 
 interface AuthModalProps {
-  state: LoginState
+  state: AuthState
   onClick: () => void
 }
 
