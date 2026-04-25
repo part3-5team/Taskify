@@ -19,7 +19,7 @@ export default function LandingFeature1({ className }: { className?: string }) {
         src={Feature1Lg}
         alt=""
         priority
-        className="mx-auto hidden lg:mx-0 lg:block"
+        className="mx-auto hidden w-auto lg:mx-0 lg:block"
       />
       <LandingDesc
         number={1}
