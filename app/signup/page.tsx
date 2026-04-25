@@ -6,7 +6,7 @@ import AuthLogo from '@/components/auth/AuthLayout/AuthLogo'
 export default function SignupPage() {
   return (
     <AuthLayout>
-      <div className="mx-auto max-w-130 pt-50">
+      <div className="mx-auto max-w-130 pt-20">
         <AuthLogo />
         <SignupForm />
         <SignupLink />
