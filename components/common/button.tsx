@@ -7,6 +7,8 @@ type ButtonVariant =
 
 type ButtonSize = "sm" | "md" | "lg";
 
+type ButtonType = "button" | "submit" | "reset";
+
 interface ButtonProps {
   children: React.ReactNode;
   variant?: ButtonVariant;
@@ -14,7 +16,9 @@ interface ButtonProps {
   onClick?: () => void;
   className?: string;
   size?: ButtonSize;
+  type?: ButtonType;
 }
+
 
 const defaultButton: Record<ButtonVariant, boolean> = {
   primary: false,
@@ -28,12 +32,12 @@ const sizeStyle: Record<ButtonSize, string> = {
   lg: "px-[140px] py-[19px]  md:px-[236px] md:py-[20px] text-2lg-18-semibold",
 }
 
-const baseStyle = "rounded-[180px] hover:cursor-pointer";
+const baseStyle = "rounded-[180px] hover:cursor-pointer text-white";
 
 const variantStyle: Record<ButtonVariant, string> = {
-  primary: "bg-brand-500 text-white hover:bg-brand-600 disabled:bg-brand-800 disabled:text-brand-950 disabled:cursor-not-allowed",
-  cancel: "bg-gray-900 text-white hover:bg-black-200 disabled:bg-gray-900 disabled:text-gray-500 disabled:cursor-not-allowed",
-  delete: "bg-red-500 text-white",
+  primary: "bg-brand-500 hover:bg-brand-600 disabled:bg-brand-800 disabled:text-brand-950 disabled:cursor-not-allowed",
+  cancel: "bg-gray-900 hover:bg-black-200 disabled:bg-gray-900 disabled:text-gray-500 disabled:cursor-not-allowed",
+  delete: "bg-red-500",
 }
 
 export default function Button({
@@ -43,13 +47,14 @@ export default function Button({
   disabled,
   onClick,
   className = "",
+  type = "button",
 }: ButtonProps) {
 
   const isDisabled = disabled ?? defaultButton[variant];
 
   return (
     <button
-      type="button"
+      type={type}
       className={`${baseStyle} ${variantStyle[variant]} ${sizeStyle[size]} ${className}`}
       disabled={isDisabled}
       onClick={onClick}

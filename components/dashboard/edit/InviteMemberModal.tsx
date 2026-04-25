@@ -36,8 +36,8 @@ export default function InviteMemberModal({
             type="button"
             onClick={onClose}
             className="md:w-6 md:h-6 text-gray-300 hover:text-white">
-              <CloseIcon />
-            </button>
+            <CloseIcon />
+          </button>
         </div>
 
         <div className="space-y-3">
