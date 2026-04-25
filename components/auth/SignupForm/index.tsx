@@ -6,7 +6,7 @@ import OpenEyeIcon from '@/assets/icons/ic_visibility_on.svg'
 import CloseEyeIcon from '@/assets/icons/ic_visibility_off.svg'
 import CheckBoxIcon from '@/assets/icons/ic_check_on.svg'
 import UnCheckBoxIcon from '@/assets/icons/ic_check_off.svg'
-import useSignupForm from '@/hooks/useSignupForm'
+import useSignupForm from '@/libs/hooks/useSignupForm'
 
 export default function SignupForm() {
   const {
