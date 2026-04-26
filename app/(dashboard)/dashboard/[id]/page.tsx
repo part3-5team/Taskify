@@ -9,6 +9,7 @@ import {
 } from '@dnd-kit/core'
 import Column from '@/components/dashboard/Column'
 import Card from '@/components/dashboard/TaskCard'
+import AddColumnButton from '@/components/dashboard/AddColumnButton'
 
 type TagData = {
   id: number
@@ -236,6 +237,17 @@ export default function DashboardPage() {
           ))}
 
           {/* TODO: 새로운 컬럼 추가 버튼 영역 */}
+          <AddColumnButton
+            onAddColumn={(title) => {
+              const newColumn = {
+                id: `col-${Date.now()}`,
+                title: title,
+                cards: [],
+              }
+              setColumns((prev) => [...prev, newColumn])
+            }}
+            canAddMore={columns.length < 20}
+          />
         </div>
 
         {/* 최상위에서 그려지는 오버레이 (스크롤 이슈 방지) */}
