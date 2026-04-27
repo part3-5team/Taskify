@@ -12,7 +12,7 @@ export default function LandingFooter({ className }: { className?: string }) {
 
       <div className="flex flex-col gap-4 lg:flex-row lg:gap-20">
         <div className="space-x-8 text-gray-400">
-          <span>Privacy</span>
+          <span>Privacy Policy</span>
           <span>FAQ</span>
         </div>
 

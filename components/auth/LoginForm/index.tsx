@@ -84,7 +84,7 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            className="flex items-center"
+            className="flex cursor-pointer items-center"
           >
             <PasswordIcon className="size-6" />
           </button>

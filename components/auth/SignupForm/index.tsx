@@ -123,7 +123,7 @@ export default function SignupForm() {
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            className="flex items-center"
+            className="flex cursor-pointer items-center"
           >
             <PasswordIcon className="size-6" />
           </button>
@@ -154,7 +154,7 @@ export default function SignupForm() {
           <button
             type="button"
             onClick={togglePasswordCheckVisibility}
-            className="flex items-center"
+            className="flex cursor-pointer items-center"
           >
             <PasswordCheckIcon className="size-6" />
           </button>
