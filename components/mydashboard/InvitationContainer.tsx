@@ -2,11 +2,21 @@
 import Input from '@/components/common/input'
 import EmptyInvitation from '@/components/mydashboard/EmptyInvitation'
 import IconSearch from '@/assets/icons/ic_search.svg'
-import DashboardInvitationList from '@/components/mydashboard/DashboardInvitationList'
+import InvitationList from '@/components/mydashboard/InvitationList'
 import { useState } from 'react'
+import { Invitation } from '@/libs/types/Dashboard'
 
-export default function DashboardInvitationContainer() {
+type InvitationContainerProps = {
+  invitations?: Invitation[]
+}
+
+export default function InvitationContainer({
+  invitations = [],
+}: InvitationContainerProps) {
   const [keyword, setKeyword] = useState('')
+
+  const hasInvitation = invitations.length > 0
+
   return (
     <div className="flex flex-col gap-5 px-12 pb-12">
       <div className="flex justify-between">
@@ -22,8 +32,11 @@ export default function DashboardInvitationContainer() {
           <IconSearch />
         </Input>
       </div>
-      {/* <EmptyInvitation /> */}
-      <DashboardInvitationList />
+      {hasInvitation ? (
+        <InvitationList invitations={invitations} />
+      ) : (
+        <EmptyInvitation />
+      )}
     </div>
   )
 }
