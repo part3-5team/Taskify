@@ -8,12 +8,12 @@ interface ColorOptionProps {
   onClick?: () => void
 }
 
-const colorStyle: Record<ColorType, string> = {
-  rose: 'bg-profile-rose',
-  orange: 'bg-profile-orange',
-  yellow: 'bg-profile-yellow',
-  green: 'bg-profile-green',
-  blue: 'bg-profile-blue',
+export const colorHex: Record<ColorType, string> = {
+  rose: '#AE2E24',
+  orange: '#9F4B00',
+  yellow: '#BD8C00',
+  green: '#206E4E',
+  blue: '#1458BC',
 }
 
 export default function ColorOption({
@@ -26,7 +26,8 @@ export default function ColorOption({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`h-12 w-full cursor-pointer rounded-xl ${colorStyle[color]} ${selected ? 'ring-offset-black-400 ring-3 ring-blue-200 ring-offset-2' : ''} `}
+      style={{ backgroundColor: colorHex[color] }}
+      className={`h-12 w-full cursor-pointer rounded-xl ${selected ? 'ring-offset-black-400 ring-3 ring-blue-200 ring-offset-2' : ''} `}
     />
   )
 }
