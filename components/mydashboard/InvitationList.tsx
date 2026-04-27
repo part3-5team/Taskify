@@ -1,10 +1,10 @@
-import { getInvitations } from '@/libs/api/dashboard'
+import { Invitation } from '@/libs/types/Dashboard'
 
 interface InvitationListProps {
-  dashboardId: number
+  invitations: Invitation[]
 }
 
-export default function InvitationList({ dashboardId, }: InvitationListProps) {
+export default function InvitationList({ invitations }: InvitationListProps) {
   return (
     <div>
       <div className="border-black-200 text-2lg-18-bold flex items-center justify-center gap-2.5 border-b px-7.5 py-3.5">
