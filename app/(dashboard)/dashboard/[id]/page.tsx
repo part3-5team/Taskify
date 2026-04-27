@@ -206,6 +206,15 @@ export default function DashboardPage() {
     setActiveCardData(null)
   }
 
+  const handleAddColumn = (title: string) => {
+    const newColumn = {
+      id: `col-${Date.now()}`,
+      title: title,
+      cards: [],
+    }
+    setColumns((prev) => [...prev, newColumn])
+  }
+
   return (
     <div className="bg-bg flex min-h-screen w-full flex-col text-gray-100">
       {/* 해당하는 대시보드 제목 불러와야함 */}
@@ -238,14 +247,7 @@ export default function DashboardPage() {
 
           {/* TODO: 새로운 컬럼 추가 버튼 영역 */}
           <AddColumnButton
-            onAddColumn={(title) => {
-              const newColumn = {
-                id: `col-${Date.now()}`,
-                title: title,
-                cards: [],
-              }
-              setColumns((prev) => [...prev, newColumn])
-            }}
+            onAddColumn={handleAddColumn}
             canAddMore={columns.length < 20}
           />
         </div>

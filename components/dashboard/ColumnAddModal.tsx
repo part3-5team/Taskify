@@ -27,10 +27,10 @@ export default function ColumnAddModal({
 
   return (
     <ModalLayout onClose={onClose} className="w-[500px] px-7 py-8 text-left">
-      <h2 className="mb-6 text-2xl-24-bold text-gray-100">새 컬럼 생성</h2>
+      <h2 className="text-2xl-24-bold mb-6 text-gray-100">새 컬럼 생성</h2>
 
       <div className="mb-8">
-        <label className="mb-2 block text-2lg-18-medium text-gray-100">
+        <label className="text-2lg-18-medium mb-2 block text-gray-100">
           이름
         </label>
         <Input
