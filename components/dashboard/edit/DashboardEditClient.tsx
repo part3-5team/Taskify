@@ -14,6 +14,7 @@ import MemberManagementSection from "./MemberManagementSection";
 import InviteMemberModal from "./InviteMemberModal";
 import { useRouter } from "next/navigation";
 import Menu from '@/assets/icons/ic_sidemenu.svg';
+import DeleteConfirmModal from "../deleteConfirmModal";
 
 interface DashboardEditClientProps {
   dashboardId: string;
@@ -38,6 +39,7 @@ export default function DashboardEditClient({
   const [invitePage, setInvitePage] = useState(1);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const memberTotalPages = Math.max(1, Math.ceil(members.length / MEMBER_PAGE_SIZE));
   const inviteTotalPages = Math.max(1, Math.ceil(invitations.length / INVITE_PAGE_SIZE));
@@ -62,12 +64,13 @@ export default function DashboardEditClient({
   };
 
   const handleDeleteDashboard = () => {
-    const ok = confirm("대시보드를 삭제하시겠습니까?");
-    if (!ok) return;
-
-    console.log("delete dashboard", dashboardId);
-    alert("API 연결 전. 삭제 요청만 가정");
+    setIsDeleteModalOpen(true);
   };
+
+  const handleConfirmDeleteDashboard = () => {
+    console.log('delete dashboard', dashboardId);
+    setIsDeleteModalOpen(false);
+  }
 
   const handleDeleteMember = (memberId: number) => {
     setMembers((prev) => {
@@ -187,6 +190,13 @@ export default function DashboardEditClient({
         open={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
         onSubmit={handleAddInvite}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        variant="dashboard"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onDelete={handleConfirmDeleteDashboard}
       />
     </>
   )
