@@ -7,13 +7,12 @@ export default function LandingFooter({ className }: { className?: string }) {
   return (
     <footer className={className}>
       <div className="py-1">
-        {/* @TODO 로고로 바꾸기 */}
         <LogoImg className="h-[34px] w-[130px] lg:h-[48px] lg:w-[186px]" />
       </div>
 
       <div className="flex flex-col gap-4 lg:flex-row lg:gap-20">
         <div className="space-x-8 text-gray-400">
-          <span>Privacy</span>
+          <span>Privacy Policy</span>
           <span>FAQ</span>
         </div>
 

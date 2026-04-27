@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const PRIVATE_ROUTES = ['/dashboard', '/mydashboard']
-const AUTH_ROUTES = ['/login', '/signup']
+const AUTH_ROUTES = ['/', '/login', '/signup']
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -25,5 +25,11 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/mydashboard/:path*', '/login', '/signup'],
+  matcher: [
+    '/',
+    '/dashboard/:path*',
+    '/mydashboard/:path*',
+    '/login',
+    '/signup',
+  ],
 }

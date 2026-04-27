@@ -20,6 +20,14 @@ export default function Column({ id, title, children }: ColumnProps) {
     id: id,
   })
 
+  const handleEditClick = () => {
+    console.log('수정하기 버튼 클릭')
+  }
+
+  const handleDeleteClick = () => {
+    console.log('삭제하기 버튼 클릭')
+  }
+
   return (
     <div className="flex h-full w-[350px] flex-shrink-0 flex-col">
       {/* 컬럼 헤더 */}
@@ -53,7 +61,11 @@ export default function Column({ id, title, children }: ColumnProps) {
             {/* 절대좌표 */}
             {isMenuOpen && (
               <div className="absolute top-full right-0 mt-2">
-                <PopdoverMenu />
+                <PopdoverMenu
+                  onClose={() => setIsMenuOpen(false)}
+                  onEditClick={handleEditClick}
+                  onDeleteClick={handleDeleteClick}
+                />
               </div>
             )}
           </div>
