@@ -1,6 +1,6 @@
 'use client'
 
-import { ComponentPropsWithoutRef } from 'react'
+import { ComponentPropsWithoutRef, useRef, useEffect } from 'react'
 import IconEdit from '@/assets/icons/ic_edit.svg'
 import IconDelete from '@/assets/icons/ic_delete.svg'
 
@@ -15,18 +15,43 @@ const Button = ({ children, className, ...props }: ButtonProps) => (
   </button>
 )
 
-// @TODO: 수정/삭제 로직 완성 후 모달 연동 필요
-export default function PopdoverMenu() {
-  const handleEditClick = () => console.log('수정 클릭')
-  const handleDeleteClick = () => console.log('삭제 클릭')
+interface PopoverMenuProps {
+  onClose: () => void
+  onEditClick: () => void
+  onDeleteClick: () => void
+}
+
+export default function PopdoverMenu({
+  onClose,
+  onEditClick,
+  onDeleteClick,
+}: PopoverMenuProps) {
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [onClose])
 
   return (
-    <div className="bg-bg bg-black-300 w-32 space-y-2.5 rounded-xl px-2.5 py-3">
-      <Button className="text-white" onClick={handleEditClick}>
+    <div
+      ref={menuRef}
+      className="bg-black-300 w-32 space-y-2.5 rounded-xl px-2.5 py-3 shadow-lg"
+    >
+      <Button className="text-white" onClick={onEditClick}>
         <IconEdit className="size-5" />
         <span>수정하기</span>
       </Button>
-      <Button className="text-red-500" onClick={handleDeleteClick}>
+      <Button className="text-red-500" onClick={onDeleteClick}>
         <IconDelete className="size-5" />
         <span>삭제하기</span>
       </Button>
