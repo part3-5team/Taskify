@@ -68,3 +68,35 @@ export const signup = async (
     message: '회원가입이 완료되었습니다.',
   }
 }
+
+export const changePassword = async ({
+  password,
+  newPassword,
+}: {
+  password: string;
+  newPassword: string;
+}) => {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('accessToken')?.value;
+
+  if (!accessToken) {
+    throw new Error('로그인이 필요합니다');
+  }
+
+  const res = await fetch(`${BASE_URL}/auth/password`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      password,
+      newPassword,
+    }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.message || '비밀번호 변경에 실패했습니다');
+  }
+};

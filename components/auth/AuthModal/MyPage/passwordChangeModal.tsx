@@ -5,6 +5,7 @@ import BackIcon from '@/assets/icons/ic_back.svg';
 import CloseIcon from '@/assets/icons/ic_X.svg';
 import Input from "@/components/common/input";
 import Button from "@/components/common/button";
+import { changePassword } from "@/libs/api/auth";
 
 interface PasswordChangeModalProps {
   isOpen: boolean;
@@ -48,21 +49,39 @@ export default function PasswordChangeModal({
       nextErrors.newPassword = '비밀번호가 일치하지 않습니다.';
     }
 
+    if (newPassword.trim() && newPassword.length < 7) {
+      nextErrors.newPassword = '비밀번호는 8자 이상 입력해주세요.';
+    }
+
     setErrors(nextErrors);
 
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const isValid = validatePassword();
 
     if (!isValid) return;
 
-    console.log('비밀번호 변경 API 연결 전', {
-      currentPassword,
-      newPassword,
-      newPasswordConfirm,
-    });
+    try {
+      await changePassword({
+        password: currentPassword,
+        newPassword,
+      });
+
+      setCurrentPassword('');
+      setNewPassword('');
+      setNewPasswordConfirm('');
+      setErrors({});
+
+      onClose();
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrors({
+          currentPassword: error.message,
+        });
+      }
+    }
   };
 
   return (
