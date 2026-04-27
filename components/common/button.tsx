@@ -37,7 +37,7 @@ const baseStyle = "rounded-[180px] hover:cursor-pointer text-white";
 const variantStyle: Record<ButtonVariant, string> = {
   primary: "bg-brand-500 hover:bg-brand-600 disabled:bg-brand-800 disabled:text-brand-950 disabled:cursor-not-allowed",
   cancel: "bg-gray-900 hover:bg-black-200 disabled:bg-gray-900 disabled:text-gray-500 disabled:cursor-not-allowed",
-  delete: "bg-red-500",
+  delete: "bg-red-500 hover:bg-red-500/70",
 }
 
 export default function Button({

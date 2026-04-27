@@ -12,7 +12,7 @@ export default function DashboardSidebar({
   onDeleteDashboard,
 }: DashboardSidebarProps) {
   return (
-    <aside className="md:max-w-[250px] lg:min-w-[540px] md:w-full min-h-screen shrink-0 border-b border-white/5 bg-black-500 px-4 py-4 md:w-[180px] md:border-b-0 md:border-r md:px-3 lg:w-[220px] md:px-4">
+    <aside className="md:max-w-[250px] lg:min-w-[540px] md:w-full min-h-[100%] shrink-0 border-b border-white/5 bg-black-500 px-4 py-4 md:w-[180px] md:border-b-0 md:border-r md:px-3 lg:w-[220px] md:px-4">
       <nav className="flex flex-col gap-2 lg:w-[280px] lg:ml-auto lg:mt-[90px] md:mt-15 mt-[30px]">
         <button
           type="button"

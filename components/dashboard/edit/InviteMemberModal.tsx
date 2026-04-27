@@ -28,14 +28,14 @@ export default function InviteMemberModal({
   };
 
   return (
-    <div className="fixed inset-0 z-99 flex items-center justify-center bg-black/40 ">
+    <div className="fixed inset-0 z-99 flex items-center justify-center bg-black/40 px-5 md:px-0">
       <div className="w-full z-999 max-w-lg rounded-2xl border border-stroke bg-modal p-[30px] shadow-2xl">
         <div className="mb-7 flex items-center justify-between">
           <h2 className="text-2xl-24-semibold text-gray-300">초대하기</h2>
           <button
             type="button"
             onClick={onClose}
-            className="md:w-6 md:h-6 text-gray-300 hover:text-white">
+            className="md:w-6 md:h-6 text-gray-300 hover:text-white ">
             <CloseIcon />
           </button>
         </div>
@@ -51,17 +51,19 @@ export default function InviteMemberModal({
           />
         </div>
 
-        <div className="mt-4 md:mt-7 flex items-center justify-between gap-5 text-2lg-18-semibold">
+        <div className="mt-4 md:mt-7 flex items-center justify-center gap-5 text-2lg-18-semibold">
           <Button
             variant="cancel"
             onClick={onClose}
-            className="w-full"
+            size="sm"
+            className="w-[141px] h-[50px] md:w-full md:h-[60px]"
           >
             취소
           </Button>
           <Button
             onClick={handleSubmit}
-            className="w-full"
+            size="sm"
+            className="w-[141px] h-[50px] md:w-full md:h-[60px]"
           >
             공유
           </Button>
