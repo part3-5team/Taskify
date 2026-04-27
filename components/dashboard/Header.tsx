@@ -1,5 +1,5 @@
 import Setting from '@/assets/icons/ic_setting.svg'
-import UserPlus from '@/assets/icons/ic_user-plus.svg'
+import UserPlus from '@/assets/icons/ic_user_plus.svg'
 import Link from 'next/link'
 export default function Header() {
   return (
