@@ -5,10 +5,16 @@ import CloseIcon from '@/assets/icons/ic_X.svg';
 import Button from '@/components/common/button';
 import Input from '@/components/common/input';
 import PasswordChangeModal from './passwordChangeModal';
+import { updateMyInfo, uploadProfileImage } from '@/libs/api/user';
 
 interface ProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onUpdateUser?: (user: {
+    email: string;
+    nickname: string;
+    profileImageUrl?: string;
+  }) => void;
   user: {
     email: string;
     nickname: string;
@@ -19,15 +25,14 @@ interface ProfileEditModalProps {
 export default function ProfileEditModal({
   isOpen,
   onClose,
+  onUpdateUser,
   user,
 }: ProfileEditModalProps) {
   const [nickname, setNickname] = useState(user.nickname);
   const [image, setImage] = useState<string | undefined>(user.imageUrl);
   const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
   const [isImageDeleted, setIsImageDeleted] = useState(false);
-
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,6 +62,7 @@ export default function ProfileEditModal({
     }
     
     // API 연결 시 file을 FormData로 보내기
+    console.log(file);
   }
 
   const handleDeleteImage = () => {
@@ -69,6 +75,7 @@ export default function ProfileEditModal({
     }
 
     // API 연결 시 imageUrl null 또는 빈 값으로 보내기
+    console.log('delete file');
   }
 
   const handleCancel = () => {
@@ -84,29 +91,42 @@ export default function ProfileEditModal({
     onClose();
   }
 
-  const handleSubmit = () => {
-    if (isImageDeleted) {
-      setImage(undefined);
-    } else if (previewImage) {
-      setImage(previewImage);
+  const handleSubmit = async () => {
+    try {
+      let profileImageUrl = image;
+
+      // 이미지 업로드
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('image', selectedFile);
+
+        const imageData = await uploadProfileImage(formData);
+        profileImageUrl = imageData.profileImageUrl;
+      }
+
+      // 프로필 수정
+      const updatedUser = await updateMyInfo({
+        nickname,
+        profileImageUrl: isImageDeleted ? null : profileImageUrl,
+      });
+
+      setNickname(updatedUser.nickname);
+      setImage(updatedUser.profileImageUrl || undefined);
+      setPreviewImage(undefined);
+      setSelectedFile(null);
+      setIsImageDeleted(false);
+
+      onUpdateUser?.({
+        ...updatedUser,
+        profileImageUrl: updatedUser.profileImageUrl || undefined,
+      });
+
+      onClose();
+
+      console.log('프로필 변경 완료', updatedUser);
+    } catch (error) {
+      console.error('프로필 수정 실패', error);
     }
-
-    if (previewImage) {
-      setImage(previewImage);
-    }
-    console.log('프로필 변경 API 연결 전', {
-      nickname,
-      selectedFile,
-      isImageDeleted,
-    });
-
-    // API 연결
-    // selectedFile이 있으면 FormData로 이미지 업로드
-    // isImageDeleted가 true면 imageUrl 삭제 요청
-
-    setPreviewImage(undefined);
-    setSelectedFile(null);
-    setIsImageDeleted(false);
   };
 
   const handleOpenPasswordModal = () => {
