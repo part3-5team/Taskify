@@ -1,23 +1,20 @@
 import EmptyMyDashboard from '@/components/mydashboard/EmptyMyDashboard'
 import DashboardList from '@/components/mydashboard/DashboardLIst'
-import { getDashboards } from '@/libs/api/dashboard'
+import type { Dashboard } from '@/libs/types/Dashboard'
 
-export default async function DashboardContainer() {
-  const result = await getDashboards({
-    page: 1,
-    size: 9,
-  })
+type DashboardContainerProps = {
+  dashboards: Dashboard[]
+}
 
-  const dashboards = result.success && result.data ? result.data.dashboards : []
+export default function DashboardContainer({
+  dashboards,
+}: DashboardContainerProps) {
   const hasDashboards = dashboards.length > 0
+
   return (
     <section className="flex flex-col gap-5 px-12 pb-12">
       <h2 className="text-xl-20-bold py-2">내 대시보드</h2>
-      {hasDashboards ? (
-        <DashboardList dashboards={dashboards} />
-      ) : (
-        <EmptyMyDashboard />
-      )}
+      {hasDashboards ? <DashboardList dashboards={dashboards} /> : <EmptyMyDashboard />}
     </section>
   )
 }

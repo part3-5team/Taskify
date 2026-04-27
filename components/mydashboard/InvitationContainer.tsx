@@ -7,11 +7,11 @@ import { useState } from 'react'
 import { Invitation } from '@/libs/types/Dashboard'
 
 type InvitationContainerProps = {
-  invitations?: Invitation[]
+  invitations: Invitation[]
 }
 
 export default function InvitationContainer({
-  invitations = [],
+  invitations,
 }: InvitationContainerProps) {
   const [keyword, setKeyword] = useState('')
 

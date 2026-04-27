@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import ModalLayout from '@/components/common/modal/ModalLayout'
 import Input from '@/components/common/input'
 import TextArea from '@/components/common/textArea'

@@ -8,8 +8,8 @@ import ColorOption, {
   ColorType,
   colorHex,
 } from '@/components/mydashboard/ColorOption'
-import { createDashboard } from '@/libs/api/dashboard'
 import { useRouter } from 'next/navigation'
+import { createDashboard } from '@/libs/api/dashboard/createdDashboard'
 
 type CreateModalProps = {
   onClose: () => void
