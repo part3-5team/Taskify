@@ -44,7 +44,6 @@ export default function AddColumnButton({
           onClose={() => setIsModalOpen(false)}
           onConfirm={(title) => {
             onAddColumn(title)
-            setIsModalOpen(false)
           }}
         />
       )}

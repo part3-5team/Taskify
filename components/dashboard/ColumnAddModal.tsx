@@ -7,7 +7,7 @@ import Button from '@/components/common/button'
 
 interface ColumnAddModalProps {
   onClose: () => void
-  onConfirm: (title: string) => void
+  onConfirm: (title: string) => void | Promise<void>
 }
 
 export default function ColumnAddModal({
@@ -16,9 +16,12 @@ export default function ColumnAddModal({
 }: ColumnAddModalProps) {
   const [title, setTitle] = useState('')
 
-  const handleConfirm = () => {
-    if (title.trim()) {
-      onConfirm(title.trim())
+  const handleConfirm = async () => {
+    const trimmedTitle = title.trim()
+
+    if (trimmedTitle) {
+      await onConfirm(trimmedTitle)
+      onClose()
     }
   }
 
