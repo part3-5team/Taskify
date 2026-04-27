@@ -1,26 +1,23 @@
 import Image from 'next/image'
-import Feature1 from '@/assets/imgs/img_Feature1.png'
-import Feature1Md from '@/assets/imgs/img_Feature1_md.png'
-import Feature1Lg from '@/assets/imgs/img_Feature1_lg.png'
+import Feature2 from '@/assets/imgs/img_Feature1.png'
+import Feature2Md from '@/assets/imgs/img_Feature1_md.png'
+import Feature2lg from '@/assets/imgs/img_Feature1_lg.png'
 
 import LandingDesc from './LandingDesc'
 
 export default function LandingFeature1({ className }: { className?: string }) {
   return (
     <div className={className}>
-      <Image src={Feature1} alt="" priority className="md:hidden" />
-      <Image
-        src={Feature1Md}
-        alt=""
-        priority
-        className="mx-auto hidden md:block lg:mx-0 lg:hidden"
-      />
-      <Image
-        src={Feature1Lg}
-        alt=""
-        priority
-        className="mx-auto hidden w-auto lg:mx-0 lg:block"
-      />
+      <div className="flex min-w-0 shrink items-center justify-center lg:justify-end">
+        <Image src={Feature2} alt="" priority className="md:hidden" />
+        <Image
+          src={Feature2Md}
+          alt=""
+          priority
+          className="mx-auto hidden md:block lg:mx-0 lg:hidden"
+        />
+        <Image src={Feature2lg} alt="" priority className="hidden lg:block" />
+      </div>
       <LandingDesc
         number={1}
         title={
