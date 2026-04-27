@@ -1,4 +1,4 @@
-export default function DashboardInvitationList() {
+export default function InvitationList() {
   return (
     <div>
       <div className="border-black-200 text-2lg-18-bold flex items-center justify-center gap-2.5 border-b px-7.5 py-3.5">
@@ -6,8 +6,10 @@ export default function DashboardInvitationList() {
         <p className="flex-2 justify-center text-gray-400">초대자</p>
         <p className="flex-2 justify-center text-gray-400">수락 여부</p>
       </div>
-      <div className="border-black-200 hover:bg-black-300 flex items-center border-b px-7.5 py-3.5 text-gray-100">
-        <p className="flex-6">대시보드</p>
+      {/*초대받은 대시보드 목록*/}
+      mockInvitations.map((invitation) => (
+      <div key={} className="border-black-200 hover:bg-black-300 flex items-center border-b px-7.5 py-3.5 text-gray-100">
+        <p className="flex-6">{}</p>
         <p className="flex-2">김할일</p>
         <div className="text-lg-16-semibold flex flex-2 gap-2 text-white">
           <button className="hover:bg-black-200 cursor-pointer rounded-full bg-gray-900 px-3.5 py-1.5">
@@ -18,6 +20,7 @@ export default function DashboardInvitationList() {
           </button>
         </div>
       </div>
+      ))
     </div>
   )
 }

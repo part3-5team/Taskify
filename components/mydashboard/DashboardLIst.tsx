@@ -2,19 +2,19 @@
 import type { Dashboard } from '@/libs/types/Dashboard'
 import IconPlusSquare from '@/assets/icons/ic_plus_square.svg'
 import IconLeftArrow from '@/assets/icons/ic_chevron_left.svg'
-import IconRightArrow from '@/assets/icons/ic_chevron_right.svg'
+import IconRightArrow from '@/assets/icons/ic_chevorn_right.svg'
 import IconHash from '@/assets/icons/ic_hash.svg'
 import Link from 'next/link'
 import { useState } from 'react'
-import DashboardCreateModal from './DashboardCreateModal'
+import DashboardCreateModal from './CreateModal'
 
-type MyDashboardListProps = {
+type DashboardListProps = {
   dashboards: Dashboard[]
 }
 
 const itemsPerPage = 4
 
-export default function MyDashboardList({ dashboards }: MyDashboardListProps) {
+export default function DashboardList({ dashboards }: DashboardListProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [isOpen, setIsOpen] = useState(false)
   const cards = [
@@ -52,7 +52,7 @@ export default function MyDashboardList({ dashboards }: MyDashboardListProps) {
               <button
                 key={card.id}
                 onClick={() => setIsOpen(true)}
-                className="bg-black-400 text-2lg-18-bold hover:bg-black-300 flex h-20 flex-1 items-center justify-center gap-2.5 rounded-[20px] border-2 border-dashed border-gray-700 px-5"
+                className="bg-black-400 text-2lg-18-bold hover:bg-black-300 flex h-20 flex-1 cursor-pointer items-center justify-center gap-2.5 rounded-[20px] border-2 border-dashed border-gray-700 px-5"
               >
                 새로운 대시보드
                 <IconPlusSquare className="text-gray-700" />

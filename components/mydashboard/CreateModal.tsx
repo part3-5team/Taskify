@@ -6,13 +6,11 @@ import Button from '@/components/common/button'
 import ColorOption from '@/components/mydashboard/ColorOption'
 import { ColorType } from '@/components/mydashboard/ColorOption'
 
-type DashboardCreateModalProps = {
+type CreateModalProps = {
   onClose: () => void
 }
 
-export default function DashboardCreateModal({
-  onClose,
-}: DashboardCreateModalProps) {
+export default function CreateModal({ onClose }: CreateModalProps) {
   const [dashboardSubject, setDashboardSubject] = useState('')
   const colors: ColorType[] = ['rose', 'orange', 'yellow', 'green', 'blue']
 
@@ -53,7 +51,10 @@ export default function DashboardCreateModal({
             생성
           </Button>
         </div>
-        <IconClose className="absolute top-6 right-6 h-6 w-6 text-gray-400" />
+        <IconClose
+          onClick={onClose}
+          className="absolute top-6 right-6 h-6 w-6 cursor-pointer text-gray-400"
+        />
       </div>
     </div>
   )
