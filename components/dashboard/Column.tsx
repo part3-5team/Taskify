@@ -10,9 +10,15 @@ interface ColumnProps {
   id: string
   title: string
   children?: React.ReactNode
+  onAddCard?: () => void
 }
 
-export default function Column({ id, title, children }: ColumnProps) {
+export default function Column({
+  id,
+  title,
+  children,
+  onAddCard,
+}: ColumnProps) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const toggleMenu = () => setIsMenuOpen((prev) => !prev)
 
@@ -44,6 +50,7 @@ export default function Column({ id, title, children }: ColumnProps) {
           <button
             aria-label="카드 추가"
             className="hover:bg-black-300 rounded-md p-1 transition-colors"
+            onClick={onAddCard}
           >
             <IconPlus className="text-brand-500 h-5 w-5" />
           </button>

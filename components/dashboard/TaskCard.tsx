@@ -16,6 +16,7 @@ interface TaskCardProps {
   assigneeName?: string
   hasImage?: boolean
   isOverlay?: boolean
+  onClick?: () => void
 }
 
 export default function TaskCard({
@@ -26,6 +27,7 @@ export default function TaskCard({
   assigneeName,
   hasImage = false,
   isOverlay = false,
+  onClick,
 }: TaskCardProps) {
   const {
     attributes,
@@ -55,6 +57,7 @@ export default function TaskCard({
       ref={isOverlay ? undefined : setNodeRef}
       {...(isOverlay ? {} : listeners)}
       {...(isOverlay ? {} : attributes)}
+      onClick={isOverlay ? undefined : onClick}
       className={`border-black-200 cursor-grab rounded-xl border p-4 transition-all ${
         isDragging && !isOverlay
           ? 'opacity-30'
