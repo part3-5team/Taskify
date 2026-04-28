@@ -1,13 +1,7 @@
 'use client'
 
-import {
-  DashboardColor,
-  initialInvitations,
-  initialMembers,
-  Invitation,
-  Member,
-} from './mock'
-import { useMemo, useState } from 'react'
+import { DashboardColor } from './mock'
+import { useEffect, useState } from 'react'
 import DashboardSidebar from './DashboardSidebar'
 import DashboardEditSection from './DashboardEditSection'
 import MemberManagementSection from './MemberManagementSection'
@@ -15,6 +9,13 @@ import InviteMemberModal from './InviteMemberModal'
 import { useRouter } from 'next/navigation'
 import Menu from '@/assets/icons/ic_sidemenu.svg'
 import DeleteConfirmModal from '../deleteConfirmModal'
+import { inviteDashboard } from '@/libs/api/dashboard/inviteDashboard'
+import { getInvitations } from '@/libs/api/dashboard/sentInvitations'
+import { cancelInvitation } from '@/libs/api/dashboard/cancelInvitations'
+import { Invitation, Member } from '@/libs/types/Dashboard'
+import { getMembers } from '@/libs/api/dashboard/getMembers'
+import { deleteMember } from '@/libs/api/dashboard/deleteMember'
+import { deleteDashboard } from '@/libs/api/dashboard/deleteDashboard'
 import { updateDashboard } from '@/libs/api/dashboard/updateDashboard'
 
 interface DashboardEditClientProps {
@@ -33,9 +34,10 @@ export default function DashboardEditClient({
   const [dashboardTitle, setDashboardTitle] = useState('계란말이 만들기')
   const [selectedColor, setSelectedColor] = useState<DashboardColor>('red')
 
-  const [members, setMembers] = useState<Member[]>(initialMembers)
-  const [invitations, setInvitations] =
-    useState<Invitation[]>(initialInvitations)
+  const [members, setMembers] = useState<Member[]>([])
+  const [memberTotalCount, setMemberTotalCount] = useState(0)
+  const [invitations, setInvitations] = useState<Invitation[]>([])
+  const [inviteTotalCount, setInviteTotalCount] = useState(0)
 
   const [memberPage, setMemberPage] = useState(1)
   const [invitePage, setInvitePage] = useState(1)
@@ -45,22 +47,177 @@ export default function DashboardEditClient({
 
   const memberTotalPages = Math.max(
     1,
-    Math.ceil(members.length / MEMBER_PAGE_SIZE),
+    Math.ceil(memberTotalCount / MEMBER_PAGE_SIZE),
   )
+
   const inviteTotalPages = Math.max(
     1,
-    Math.ceil(invitations.length / INVITE_PAGE_SIZE),
+    Math.ceil(inviteTotalCount / INVITE_PAGE_SIZE),
   )
 
-  const pagedMembers = useMemo(() => {
-    const start = (memberPage - 1) * MEMBER_PAGE_SIZE
-    return members.slice(start, start + MEMBER_PAGE_SIZE)
-  }, [members, memberPage])
+  useEffect(() => {
+    const fetchMembers = async () => {
+      const result = await getMembers({
+        dashboardId: Number(dashboardId),
+        page: memberPage,
+        size: MEMBER_PAGE_SIZE,
+      })
 
-  const pagedInvitations = useMemo(() => {
-    const start = (invitePage - 1) * INVITE_PAGE_SIZE
-    return invitations.slice(start, start + INVITE_PAGE_SIZE)
-  }, [invitations, invitePage])
+      if (!result.success || !result.data) {
+        alert(result.error ?? '구성원 목록을 불러오지 못했습니다')
+        return
+      }
+
+      setMembers(result.data.members)
+      setMemberTotalCount(result.data.totalCount)
+    }
+
+    fetchMembers()
+  }, [dashboardId, memberPage])
+
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      const result = await getInvitations({
+        dashboardId: Number(dashboardId),
+        page: invitePage,
+        size: INVITE_PAGE_SIZE,
+      })
+
+      if (!result.success || !result.data) {
+        alert(result.error ?? '초대 목록을 불러오지 못했습니다.')
+        return
+      }
+
+      setInvitations(result.data.invitations)
+      setInviteTotalCount(result.data.totalCount)
+    }
+
+    fetchInvitations()
+  }, [dashboardId, invitePage])
+
+  const handleDeleteDashboard = () => {
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleConfirmDeleteDashboard = async () => {
+    const result = await deleteDashboard({
+      dashboardId: Number(dashboardId),
+    })
+
+    if (!result.success) {
+      alert(result.error ?? '대시보드 삭제에 실패했습니다')
+      return
+    }
+
+    setIsDeleteModalOpen(false)
+
+    router.push('/mydashboard')
+  }
+
+  const handleDeleteMember = async (memberId: number) => {
+    const result = await deleteMember({ memberId })
+
+    if (!result.success) {
+      alert(result.error ?? '구성원 삭제에 실패했습니다')
+      return
+    }
+
+    const nextTotalCount = Math.max(0, memberTotalCount - 1)
+    const nextTotalPages = Math.max(
+      1,
+      Math.ceil(nextTotalCount / MEMBER_PAGE_SIZE),
+    )
+
+    setMemberTotalCount(nextTotalCount)
+
+    if (memberPage > nextTotalPages) {
+      setMemberPage(nextTotalPages)
+      return
+    }
+
+    const membersResult = await getMembers({
+      dashboardId: Number(dashboardId),
+      page: memberPage,
+      size: MEMBER_PAGE_SIZE,
+    })
+
+    if (!membersResult.success || !membersResult.data) {
+      alert(membersResult.error ?? '구성원 목록을 불러오지 못했습니다')
+      return
+    }
+
+    setMembers(membersResult.data.members)
+    setMemberTotalCount(membersResult.data.totalCount)
+  }
+
+  const handleCancelInvite = async (inviteId: number) => {
+    const result = await cancelInvitation({
+      dashboardId: Number(dashboardId),
+      invitationId: inviteId,
+    })
+
+    if (!result.success) {
+      alert(result.error ?? '초대 취소에 실패했습니다')
+      return
+    }
+
+    const nextTotalCount = Math.max(0, inviteTotalCount - 1)
+    const nextTotalPages = Math.max(
+      1,
+      Math.ceil(nextTotalCount / INVITE_PAGE_SIZE),
+    )
+
+    setInviteTotalCount(nextTotalCount)
+
+    if (invitePage > nextTotalPages) {
+      setInvitePage(nextTotalPages)
+      return
+    }
+
+    const invitationsResult = await getInvitations({
+      dashboardId: Number(dashboardId),
+      page: invitePage,
+      size: INVITE_PAGE_SIZE,
+    })
+
+    if (!invitationsResult.success || !invitationsResult.data) {
+      alert(invitationsResult.error ?? '초대 목록을 불러오지 못했습니다')
+      return
+    }
+
+    setInvitations(invitationsResult.data.invitations)
+    setInviteTotalCount(invitationsResult.data.totalCount)
+  }
+
+  const handleAddInvite = async (email: string): Promise<boolean> => {
+    const result = await inviteDashboard(Number(dashboardId), email)
+
+    if (!result.success || result.data === null) {
+      alert(result.error ?? '초대 보내기에 실패했습니다')
+      return false
+    }
+
+    if (invitePage !== 1) {
+      setInvitePage(1)
+      return true
+    }
+
+    const invitationsResult = await getInvitations({
+      dashboardId: Number(dashboardId),
+      page: 1,
+      size: INVITE_PAGE_SIZE,
+    })
+
+    if (!invitationsResult.success || !invitationsResult.data) {
+      alert(invitationsResult.error ?? '초대 목록을 불러오지 못했습니다')
+      return true
+    }
+
+    setInvitations(invitationsResult.data.invitations)
+    setInviteTotalCount(invitationsResult.data.totalCount)
+
+    return true
+  }
 
   const handleUpdateDashboard = async () => {
     const formData = new FormData()
@@ -80,44 +237,6 @@ export default function DashboardEditClient({
       console.error('Dashboard update error:', error)
       alert('알 수 없는 오류가 발생했습니다.')
     }
-  }
-
-  const handleDeleteDashboard = () => {
-    setIsDeleteModalOpen(true)
-  }
-
-  const handleConfirmDeleteDashboard = () => {
-    console.log('delete dashboard', dashboardId)
-    setIsDeleteModalOpen(false)
-  }
-
-  const handleDeleteMember = (memberId: number) => {
-    setMembers((prev) => {
-      const next = prev.filter((member) => member.id !== memberId)
-      const nextTotalPages = Math.max(
-        1,
-        Math.ceil(next.length / MEMBER_PAGE_SIZE),
-      )
-      if (memberPage > nextTotalPages) setMemberPage(nextTotalPages)
-      return next
-    })
-  }
-
-  const handleCancelInvite = (inviteId: number) => {
-    setInvitations((prev) => {
-      const next = prev.filter((invite) => invite.id !== inviteId)
-      const nextTotalPages = Math.max(
-        1,
-        Math.ceil(next.length / INVITE_PAGE_SIZE),
-      )
-      if (invitePage > nextTotalPages) setInvitePage(nextTotalPages)
-      return next
-    })
-  }
-
-  const handleAddInvite = (email: string) => {
-    setInvitations((prev) => [{ id: Date.now(), email }, ...prev])
-    setInvitePage(1)
   }
 
   const handleBack = () => {
@@ -157,7 +276,7 @@ export default function DashboardEditClient({
             <button
               type="button"
               onClick={() => setIsMobileSidebarOpen(false)}
-              className="fixed top-0 right-0 z-40 h-screen w-screen bg-black/70 md:hidden"
+              className="fixed top-0 right-0 z-40 h-screen w-[100vw] bg-black/70 md:hidden"
             />
           )}
 
@@ -184,8 +303,8 @@ export default function DashboardEditClient({
               />
             ) : (
               <MemberManagementSection
-                members={pagedMembers}
-                invitations={pagedInvitations}
+                members={members}
+                invitations={invitations}
                 memberPage={memberPage}
                 invitePage={invitePage}
                 memberTotalPages={memberTotalPages}

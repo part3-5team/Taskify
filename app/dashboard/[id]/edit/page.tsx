@@ -1,16 +1,13 @@
-import DashboardEditClient from "@/components/dashboard/edit/DashboardEditClient";
+import DashboardEditClient from '@/components/dashboard/edit/DashboardEditClient'
 
 interface EditPageProps {
   params: Promise<{
-    id: string;
-  }>;
+    id: string
+  }>
 }
 
-export default async function EditPage({ params, }: EditPageProps) {
+export default async function EditPage({ params }: EditPageProps) {
+  const { id } = await params
 
-  const { id } = await params;
-
-  return (
-    <DashboardEditClient dashboardId={id} />
-  )
+  return <DashboardEditClient dashboardId={id} />
 }
