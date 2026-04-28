@@ -65,3 +65,26 @@ export interface GetMembersResponse {
   members: Member[]
   totalCount: number
 }
+
+export const dashboardColors = [
+  {
+    key: '#AE2E24',
+    className: 'bg-profile-rose',
+  },
+  {
+    key: '#9F4B00',
+    className: 'bg-profile-orange',
+  },
+  {
+    key: '#BD8C00',
+    className: 'bg-profile-yellow',
+  },
+  {
+    key: '#206E4E',
+    className: 'bg-profile-green',
+  },
+  {
+    key: '#1458BC',
+    className: 'bg-profile-blue',
+  },
+]
