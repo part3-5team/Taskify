@@ -15,7 +15,15 @@ export default function InvitationContainer({
 }: InvitationContainerProps) {
   const [keyword, setKeyword] = useState('')
 
+  const searchKeyword = keyword.trim().toLowerCase()
+
+  const filteredInvitations = invitations.filter((invitations) => {
+    return invitations.dashboard.title.toLowerCase().includes(searchKeyword)
+  })
+
   const hasInvitation = invitations.length > 0
+  const hasSearchResult = filteredInvitations.length > 0
+  const isSearching = searchKeyword.length > 0
 
   return (
     <div className="flex flex-col gap-5 px-12 pb-12">
@@ -32,10 +40,17 @@ export default function InvitationContainer({
           <IconSearch />
         </Input>
       </div>
-      {hasInvitation ? (
-        <InvitationList invitations={invitations} />
-      ) : (
-        <EmptyInvitation />
+
+      {!hasInvitation && <EmptyInvitation />}
+
+      {hasInvitation && hasSearchResult && (
+        <InvitationList invitations={filteredInvitations} />
+      )}
+
+      {hasInvitation && !hasSearchResult && isSearching && (
+        <div className="flex items-center justify-center py-10 text-gray-400">
+          검색 결과가 없습니다.
+        </div>
       )}
     </div>
   )
