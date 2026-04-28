@@ -16,6 +16,7 @@ import { Invitation, Member } from '@/libs/types/Dashboard'
 import { getMembers } from '@/libs/api/dashboard/getMembers'
 import { deleteMember } from '@/libs/api/dashboard/deleteMember'
 import { deleteDashboard } from '@/libs/api/dashboard/deleteDashboard'
+import { updateDashboard } from '@/libs/api/dashboard/updateDashboard'
 
 interface DashboardEditClientProps {
   dashboardId: string
@@ -93,14 +94,6 @@ export default function DashboardEditClient({
 
     fetchInvitations()
   }, [dashboardId, invitePage])
-
-  const handleUpdateDashboard = () => {
-    console.log('dashboard update', {
-      dashboardId,
-      dashboardTitle,
-      selectedColor,
-    })
-  }
 
   const handleDeleteDashboard = () => {
     setIsDeleteModalOpen(true)
@@ -224,6 +217,26 @@ export default function DashboardEditClient({
     setInviteTotalCount(invitationsResult.data.totalCount)
 
     return true
+  }
+
+  const handleUpdateDashboard = async () => {
+    const formData = new FormData()
+    formData.append('title', dashboardTitle)
+    formData.append('color', selectedColor)
+
+    try {
+      const res = await updateDashboard(Number(dashboardId), formData)
+
+      if (!res.success) {
+        alert(res.error)
+        return
+      }
+
+      alert('대시보드가 성공적으로 수정되었습니다.')
+    } catch (error) {
+      console.error('Dashboard update error:', error)
+      alert('알 수 없는 오류가 발생했습니다.')
+    }
   }
 
   const handleBack = () => {

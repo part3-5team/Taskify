@@ -4,6 +4,7 @@ import IconPlusSquare from '@/assets/icons/ic_plus_square.svg'
 import IconLeftArrow from '@/assets/icons/ic_chevron_left.svg'
 import IconRightArrow from '@/assets/icons/ic_chevorn_right.svg'
 import IconHash from '@/assets/icons/ic_hash.svg'
+import IconCrown from '@/assets/icons/ic_crown.svg'
 import Link from 'next/link'
 import { useState } from 'react'
 import DashboardCreateModal from './CreateModal'
@@ -69,7 +70,9 @@ export default function DashboardList({ dashboards }: DashboardListProps) {
               <div className="flex items-center gap-2">
                 <IconHash style={{ color: card.dashboard.color }} />
                 <span>{card.dashboard.title}</span>
-                {card.dashboard.createdByMe && <span>👑</span>}
+                {card.dashboard.createdByMe && (
+                  <IconCrown className="text-brand-600" />
+                )}
               </div>
 
               <IconRightArrow className="h-6 w-6 text-gray-400" />
