@@ -1,9 +1,14 @@
 import { Invitation } from '@/libs/types/Dashboard'
+
 interface InvitationListProps {
   invitations: Invitation[]
+  onRespondInvitation: (invitationId: number, inviteAccepted: boolean) => void
 }
 
-export default function InvitationList({ invitations }: InvitationListProps) {
+export default function InvitationList({
+  invitations,
+  onRespondInvitation,
+}: InvitationListProps) {
   return (
     <div>
       <div className="border-black-200 text-2lg-18-bold flex items-center justify-center gap-2.5 border-b px-7.5 py-3.5">
@@ -22,7 +27,7 @@ export default function InvitationList({ invitations }: InvitationListProps) {
           >
             <p className="flex-6">{invitation.dashboard.title}</p>
             <div className="flex flex-2 items-center gap-2">
-              {/* 사용자 컬러로 지정된 컬러로 나오게? */}
+              {/* TODO : 사용자 컬러로 지정된 컬러로 나오게? */}
               <div className="bg-profile-blue text-md-14-medium flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white">
                 {avatar}
               </div>
@@ -30,11 +35,19 @@ export default function InvitationList({ invitations }: InvitationListProps) {
               <p>{inviter.nickname}</p>
             </div>
             <div className="text-lg-16-semibold flex flex-2 gap-2 text-white">
-              {/*TODO : 거절-받은 초대 삭제, 수락-대시보드에 멤버 추가*/}
-              <button className="hover:bg-black-200 cursor-pointer rounded-full bg-gray-900 px-3.5 py-1.5">
+              {/* 받은 초대 거절/수락 */}
+              <button
+                type="button"
+                onClick={() => onRespondInvitation(invitation.id, false)}
+                className="hover:bg-black-200 cursor-pointer rounded-full bg-gray-900 px-3.5 py-1.5"
+              >
                 거절
               </button>
-              <button className="bg-brand-500 hover:bg-brand-600 cursor-pointer rounded-full px-3.5 py-1.5">
+              <button
+                type="button"
+                onClick={() => onRespondInvitation(invitation.id, true)}
+                className="bg-brand-500 hover:bg-brand-600 cursor-pointer rounded-full px-3.5 py-1.5"
+              >
                 수락
               </button>
             </div>

@@ -5,6 +5,8 @@ import IconSearch from '@/assets/icons/ic_search.svg'
 import InvitationList from '@/components/mydashboard/InvitationList'
 import { useState } from 'react'
 import { Invitation } from '@/libs/types/Dashboard'
+import { respondInvitation } from '@/libs/api/dashboard/getInvitations'
+import { useRouter } from 'next/navigation'
 
 type InvitationContainerProps = {
   invitations: Invitation[]
@@ -14,11 +16,34 @@ export default function InvitationContainer({
   invitations,
 }: InvitationContainerProps) {
   const [keyword, setKeyword] = useState('')
-
   const searchKeyword = keyword.trim().toLowerCase()
 
-  const filteredInvitations = invitations.filter((invitations) => {
-    return invitations.dashboard.title.toLowerCase().includes(searchKeyword)
+  const router = useRouter()
+
+  const [invitationItems, setInvitationItems] = useState(invitations)
+  const handleRespondInvitation = async (
+    invitationId: number,
+    inviteAccepted: boolean,
+  ) => {
+    const result = await respondInvitation({
+      invitationId,
+      inviteAccepted,
+    })
+
+    if (!result.success) {
+      alert(result.error)
+      return
+    }
+
+    setInvitationItems((prev) =>
+      prev.filter((invitation) => invitation.id !== invitationId),
+    )
+    if (inviteAccepted) {
+      router.refresh()
+    }
+  }
+  const filteredInvitations = invitationItems.filter((invitation) => {
+    return invitation.dashboard.title.toLowerCase().includes(searchKeyword)
   })
 
   const hasInvitation = invitations.length > 0
@@ -44,7 +69,10 @@ export default function InvitationContainer({
       {!hasInvitation && <EmptyInvitation />}
 
       {hasInvitation && hasSearchResult && (
-        <InvitationList invitations={filteredInvitations} />
+        <InvitationList
+          invitations={filteredInvitations}
+          onRespondInvitation={handleRespondInvitation}
+        />
       )}
 
       {hasInvitation && !hasSearchResult && isSearching && (
