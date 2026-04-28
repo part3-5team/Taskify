@@ -1,24 +1,24 @@
-import Button from "@/components/common/button";
-import { Invitation, Member } from "./mock";
-import Pagination from "./Pagination";
-import BackIcon from '@/assets/icons/ic_X.svg';
-import InviteIcon from '@/assets/icons/ic_user-plus.svg';
+import Button from '@/components/common/button'
+import Pagination from './Pagination'
+import BackIcon from '@/assets/icons/ic_X.svg'
+import InviteIcon from '@/assets/icons/ic_user-plus.svg'
+import { Invitation, Member } from '@/libs/types/Dashboard'
 
 interface MemberManagementSectionProps {
-  members: Member[];
-  invitations: Invitation[];
-  memberPage: number;
-  invitePage: number;
-  memberTotalPages: number;
-  inviteTotalPages: number;
-  onPrevMemberPage: () => void;
-  onNextMemberPage: () => void;
-  onPrevInvitePage: () => void;
-  onNextInvitePage: () => void;
-  onDeleteMember: (id: number) => void;
-  onCancelInvite: (id: number) => void;
-  onOpenInviteModal: () => void;
-  onBack: () => void;
+  members: Member[]
+  invitations: Invitation[]
+  memberPage: number
+  invitePage: number
+  memberTotalPages: number
+  inviteTotalPages: number
+  onPrevMemberPage: () => void
+  onNextMemberPage: () => void
+  onPrevInvitePage: () => void
+  onNextInvitePage: () => void
+  onDeleteMember: (id: number) => void
+  onCancelInvite: (id: number) => void
+  onOpenInviteModal: () => void
+  onBack: () => void
 }
 
 export default function MemberManagementSection({
@@ -38,29 +38,32 @@ export default function MemberManagementSection({
   onBack,
 }: MemberManagementSectionProps) {
   return (
-    <section className="w-full pt-[20px] px-[20px] md:pt-[30px] md:px-6 lg:pl-[50px] sm:px-0">
-      <div className="lg:min-w-[700px] mb-8 flex items-start justify-between">
-        <h1 className="leading-[170%] text-xl font-bold text-white md:text-2xl sm:text-xl-20-bold">멤버 관리</h1>
+    <section className="w-full px-[20px] pt-[20px] sm:px-0 md:px-6 md:pt-[30px] lg:pl-[50px]">
+      <div className="mb-8 flex items-start justify-between lg:min-w-[700px]">
+        <h1 className="sm:text-xl-20-bold text-xl leading-[170%] font-bold text-white md:text-2xl">
+          멤버 관리
+        </h1>
 
-        <div className="flex flex-col items-center text-gray-300 text-lg-14-semibold gap-[6px]">
-          <button 
+        <div className="text-lg-14-semibold flex flex-col items-center gap-[6px] text-gray-300">
+          <button
             type="button"
             onClick={onBack}
             className="text-xs text-gray-400 hover:text-white md:text-sm"
           >
-            <div className="border border-gray-300 rounded-full p-1 w-fit">
+            <div className="w-fit rounded-full border border-gray-300 p-1">
               <BackIcon className="size-6" />
             </div>
           </button>
           <span className="hidden md:block">돌아가기</span>
         </div>
-
       </div>
 
       <div className="space-y-10">
         <div>
           <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 className="lg:text-xl-20-bold md:text-2lg-18-bold sm:text-lg-16-bold text-white">구성원</h2>
+            <h2 className="lg:text-xl-20-bold md:text-2lg-18-bold sm:text-lg-16-bold text-white">
+              구성원
+            </h2>
             <Pagination
               currentPage={memberPage}
               totalPages={memberTotalPages}
@@ -69,7 +72,7 @@ export default function MemberManagementSection({
             />
           </div>
 
-          <div className="overflow-hidden rounded-2xl bg-modal">
+          <div className="bg-modal overflow-hidden rounded-2xl">
             {members.map((member) => (
               <div
                 key={member.id}
@@ -77,11 +80,13 @@ export default function MemberManagementSection({
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white ${member.avatarColor}`}
+                    className={`bg-brand-400 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white`}
                   >
                     {member.nickname[0]}
                   </div>
-                  <span className="truncate lg:text-2lg-18-medium md:text-2lg-18-medium sm:text-lg-16-medium text-white">{member.nickname}</span>
+                  <span className="lg:text-2lg-18-medium md:text-2lg-18-medium sm:text-lg-16-medium truncate text-white">
+                    {member.nickname}
+                  </span>
                 </div>
 
                 <Button
@@ -98,8 +103,10 @@ export default function MemberManagementSection({
 
         <div>
           <div className="mb-[10px] flex items-center justify-between gap-4">
-            <div className="flex lg:max-w-[440px] items-center gap-3">
-              <h2 className="lg:text-xl-20-bold md:text-2lg-18-bold text-lg-14-semibold sm:text-lg-16-bold text-white">초대내역</h2>
+            <div className="flex items-center gap-3 lg:max-w-[440px]">
+              <h2 className="lg:text-xl-20-bold md:text-2lg-18-bold text-lg-14-semibold sm:text-lg-16-bold text-white">
+                초대내역
+              </h2>
               <Button
                 size="sm"
                 onClick={onOpenInviteModal}
@@ -118,13 +125,15 @@ export default function MemberManagementSection({
             />
           </div>
 
-          <div className="overflow-hidden rounded-2xl bg-modal">
+          <div className="bg-modal overflow-hidden rounded-2xl">
             {invitations.map((invite) => (
               <div
                 key={invite.id}
-                className="flex items-center justify-between gap-3 border-b border-white/5 px-4 py-3 las:border-b-0"
+                className="las:border-b-0 flex items-center justify-between gap-3 border-b border-white/5 px-4 py-3"
               >
-                <span className="truncate md:text-2lg-18-medium sm:text-lg-16-medium text-white">{invite.email}</span>
+                <span className="md:text-2lg-18-medium sm:text-lg-16-medium truncate text-white">
+                  {invite.invitee.email}
+                </span>
 
                 <Button
                   size="sm"
