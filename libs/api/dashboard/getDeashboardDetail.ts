@@ -13,10 +13,17 @@ export const getDashboardDetail = async (
     const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')?.value
 
+    if (!token) {
+      return {
+        success: false,
+        data: null,
+        error: '인증 토큰이 없습니다. 다시 로그인해주세요.',
+      }
+    }
+
     const response = await fetch(`${BASE_URL}/dashboards/${dashboardId}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     })
@@ -38,6 +45,7 @@ export const getDashboardDetail = async (
     }
   } catch (error) {
     console.error(error)
+
     return {
       success: false,
       data: null,

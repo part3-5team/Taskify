@@ -89,13 +89,15 @@ export default function MemberManagementSection({
                   </span>
                 </div>
 
-                <Button
-                  size="sm"
-                  variant="cancel"
-                  onClick={() => onDeleteMember(member.id)}
-                >
-                  삭제
-                </Button>
+                {!member.isOwner && (
+                  <Button
+                    size="sm"
+                    variant="cancel"
+                    onClick={() => onDeleteMember(member.id)}
+                  >
+                    삭제
+                  </Button>
+                )}
               </div>
             ))}
           </div>
