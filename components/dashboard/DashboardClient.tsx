@@ -16,6 +16,11 @@ import AddColumnButton from '@/components/dashboard/AddColumnButton'
 import TaskDetailModal from '@/components/dashboard/TaskDetailModal'
 import TaskCreateModal from '@/components/dashboard/TaskCreateModal'
 
+interface DashboardClientProps {
+  dashboardId: number
+  dashboardTitle: string
+}
+
 type TagData = {
   id: number
   label: string
@@ -107,11 +112,15 @@ const initialColumns: ColumnData[] = [
   },
 ]
 
-export default function DashboardClient() {
+export default function DashboardClient({
+  dashboardId: _dashboardId,
+  dashboardTitle,
+}: DashboardClientProps) {
   const [columns, setColumns] = useState<ColumnData[]>(initialColumns)
   const [activeCardData, setActiveCardData] = useState<CardData | null>(null)
   const [selectedTask, setSelectedTask] = useState<CardData | null>(null)
-  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] = useState<string>('')
+  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] =
+    useState<string>('')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   const sensors = useSensors(
@@ -119,7 +128,7 @@ export default function DashboardClient() {
       activationConstraint: {
         distance: 5, // 5px 이상 움직여야 드래그로 간주
       },
-    })
+    }),
   )
 
   // SSR Hydration 에러 방지용
@@ -238,9 +247,8 @@ export default function DashboardClient() {
 
   return (
     <div className="bg-bg flex min-h-screen w-full flex-col text-gray-100">
-      {/* 해당하는 대시보드 제목 불러와야함 */}
       <h1 className="text-3xl-32-bold px-12 pt-6 pb-1 leading-19">
-        포트폴리오
+        {dashboardTitle}
       </h1>
 
       {/* 컬럼 가로 */}
