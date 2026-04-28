@@ -6,6 +6,12 @@ import { AuthState } from '../types/Auth'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
+const getAccessToken = async () => {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('accessToken')?.value
+  return token
+}
+
 export const login = async (
   _prevState: AuthState,
   formData: FormData,
@@ -73,14 +79,13 @@ export const changePassword = async ({
   password,
   newPassword,
 }: {
-  password: string;
-  newPassword: string;
+  password: string
+  newPassword: string
 }) => {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('accessToken')?.value;
+  const accessToken = await getAccessToken()
 
   if (!accessToken) {
-    throw new Error('로그인이 필요합니다');
+    throw new Error('로그인이 필요합니다')
   }
 
   const res = await fetch(`${BASE_URL}/auth/password`, {
@@ -93,10 +98,18 @@ export const changePassword = async ({
       password,
       newPassword,
     }),
-  });
+  })
 
   if (!res.ok) {
-    const data = await res.json();
-    throw new Error(data.message || '비밀번호 변경에 실패했습니다');
+    const data = await res.json()
+    throw new Error(data.message || '비밀번호 변경에 실패했습니다')
   }
-};
+}
+
+export const logout = async () => {
+  const cookieStore = await cookies()
+
+  cookieStore.delete('accessToken')
+
+  redirect('/login')
+}
