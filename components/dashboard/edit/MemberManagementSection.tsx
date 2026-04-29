@@ -2,7 +2,9 @@ import Button from '@/components/common/button'
 import Pagination from './Pagination'
 import BackIcon from '@/assets/icons/ic_X.svg'
 import InviteIcon from '@/assets/icons/ic_user-plus.svg'
+import ProfileImg from '@/assets/imgs/img_default_profile.svg'
 import { Invitation, Member } from '@/libs/types/Dashboard'
+import Image from 'next/image'
 
 interface MemberManagementSectionProps {
   members: Member[]
@@ -80,9 +82,17 @@ export default function MemberManagementSection({
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <div
-                    className={`bg-brand-400 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white`}
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-white`}
                   >
-                    {member.nickname[0]}
+                    {member.profileImageUrl ? (
+                      <Image
+                        src={member.profileImageUrl}
+                        alt="profile"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <ProfileImg className="h-full w-full rounded-full" />
+                    )}
                   </div>
                   <span className="lg:text-2lg-18-medium md:text-2lg-18-medium sm:text-lg-16-medium truncate text-white">
                     {member.nickname}
