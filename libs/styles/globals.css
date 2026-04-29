@@ -135,3 +135,89 @@
 body {
   font-family: var(--font-sans);
 }
+
+/* ─── react-datepicker 다크 테마 커스텀 ─── */
+.react-datepicker {
+  background-color: rgb(32, 31, 35) !important;
+  border: 1px solid rgb(82, 79, 91) !important;
+  border-radius: 12px !important;
+  font-family: var(--font-sans) !important;
+  color: rgb(248, 247, 250) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.react-datepicker__header {
+  background-color: rgb(38, 38, 41) !important;
+  border-bottom: 1px solid rgb(82, 79, 91) !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 10px 0 8px !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker-time__header {
+  color: rgb(248, 247, 250) !important;
+}
+
+.react-datepicker__day {
+  color: rgb(214, 213, 217) !important;
+  border-radius: 6px !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: rgb(51, 50, 54) !important;
+  color: rgb(248, 247, 250) !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: rgb(0, 162, 0) !important;
+  color: white !important;
+}
+
+.react-datepicker__day--today {
+  font-weight: 700;
+  color: rgb(63, 192, 63) !important;
+}
+
+.react-datepicker__day--disabled {
+  color: rgb(82, 79, 91) !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: rgb(163, 159, 178) !important;
+}
+
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: rgb(248, 247, 250) !important;
+}
+
+.react-datepicker__time-container {
+  border-left: 1px solid rgb(82, 79, 91) !important;
+}
+
+.react-datepicker__time {
+  background-color: rgb(32, 31, 35) !important;
+}
+
+.react-datepicker__time-list-item {
+  color: rgb(214, 213, 217) !important;
+}
+
+.react-datepicker__time-list-item:hover {
+  background-color: rgb(51, 50, 54) !important;
+  color: rgb(248, 247, 250) !important;
+}
+
+.react-datepicker__time-list-item--selected {
+  background-color: rgb(0, 162, 0) !important;
+  color: white !important;
+}
+
+.react-datepicker__triangle {
+  display: none !important;
+}
+
+.react-datepicker-popper {
+  z-index: 50 !important;
+}
