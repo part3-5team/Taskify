@@ -30,6 +30,8 @@ export default function CreateModal({ onClose }: CreateModalProps) {
     router.refresh()
   }
   const [dashboardSubject, setDashboardSubject] = useState('')
+  const isButtonDisabled = dashboardSubject.length === 0
+
   const colors: ColorType[] = ['rose', 'orange', 'yellow', 'green', 'blue']
 
   const [selectedColor, setSelectedColor] = useState<ColorType>('rose')
@@ -70,7 +72,7 @@ export default function CreateModal({ onClose }: CreateModalProps) {
           <Button type="button" onClick={onClose} variant="cancel">
             취소
           </Button>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" disabled={isButtonDisabled}>
             생성
           </Button>
         </div>
