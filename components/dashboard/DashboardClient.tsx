@@ -15,15 +15,19 @@ import Card from '@/components/dashboard/TaskCard'
 import AddColumnButton from '@/components/dashboard/AddColumnButton'
 import TaskDetailModal from '@/components/dashboard/TaskDetailModal'
 import TaskCreateModal from '@/components/dashboard/TaskCreateModal'
+import { Member, Column as ServerColumn } from '@/libs/types/Dashboard'
 
 interface DashboardClientProps {
   dashboardId: number
   dashboardTitle: string
+  members: Member[]
+  initialServerColumns: ServerColumn[]
 }
 
 type TagData = {
   id: number
   label: string
+  color?: string
 }
 
 type CardData = {
@@ -41,87 +45,28 @@ type ColumnData = {
   cards: CardData[]
 }
 
-const initialColumns: ColumnData[] = [
-  {
-    id: 'todo',
-    title: 'To-do',
-    cards: [
-      {
-        id: 'card-1',
-        title: '기능 설정',
-        tags: [{ id: 1, label: '버그' }],
-        dueDate: '2024-07-01',
-        assigneeName: '최유현',
-      },
-      {
-        id: 'card-2',
-        title: '기능 설정',
-        tags: [
-          { id: 1, label: '버그' },
-          { id: 2, label: '프로젝트' },
-        ],
-        dueDate: '2024-07-01',
-        assigneeName: '김개발',
-      },
-      {
-        id: 'card-3',
-        title: '기능 설정',
-        tags: [
-          { id: 1, label: '디자인' },
-          { id: 2, label: '일정' },
-          { id: 3, label: '프로젝트' },
-        ],
-        dueDate: '2024-07-01',
-        assigneeName: '김개발',
-        hasImage: true,
-      },
-    ],
-  },
-  {
-    id: 'on-progress',
-    title: 'On Progress',
-    cards: [
-      {
-        id: 'card-4',
-        title: '기능 설정',
-        tags: [{ id: 1, label: '버그' }],
-        dueDate: '2024-07-01',
-        assigneeName: '최유현',
-      },
-      {
-        id: 'card-5',
-        title: '기능 설정',
-        tags: [{ id: 1, label: '버그' }],
-        dueDate: '2024-07-01',
-        assigneeName: '최유현',
-      },
-    ],
-  },
-  {
-    id: 'done',
-    title: 'Done',
-    cards: [
-      {
-        id: 'card-6',
-        title: '기능 설정',
-        tags: [{ id: 1, label: '버그' }],
-        dueDate: '2024-07-01',
-        assigneeName: '최유현',
-      },
-    ],
-  },
-]
-
 export default function DashboardClient({
-  dashboardId: _dashboardId,
+  dashboardId,
   dashboardTitle,
+  members,
+  initialServerColumns,
 }: DashboardClientProps) {
-  const [columns, setColumns] = useState<ColumnData[]>(initialColumns)
+  // 서버에서 받아온 실제 컬럼 데이터를 클라이언트 구조(ColumnData)로 변환
+  const convertedColumns: ColumnData[] = initialServerColumns.map((col) => ({
+    id: String(col.id),
+    title: col.title,
+    cards: [], // TODO: 실제 카드 목록 조회 API 연동 시 업데이트 필요
+  }))
+
+  const [columns, setColumns] = useState<ColumnData[]>(convertedColumns)
   const [activeCardData, setActiveCardData] = useState<CardData | null>(null)
   const [selectedTask, setSelectedTask] = useState<CardData | null>(null)
   const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] =
     useState<string>('')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  // 할일 생성 모달에 전달할 현재 컬럼 정보
+  const [activeColumnId, setActiveColumnId] = useState<number>(0)
+  const [activeColumnStringId, setActiveColumnStringId] = useState<string>('')
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -245,6 +190,25 @@ export default function DashboardClient({
     setSelectedTaskColumnTitle(columnTitle)
   }
 
+  // 카드 생성 성공 시 해당 컬럼에 즉시 추가
+  const handleCardCreated = (card: import('@/libs/types/Dashboard').Card) => {
+    const newCard: CardData = {
+      id: String(card.id),
+      title: card.title,
+      tags: card.tags.map((label, idx) => ({ id: idx, label })),
+      dueDate: card.dueDate ?? undefined,
+      assigneeName: card.assignee?.nickname,
+      hasImage: !!card.imageUrl,
+    }
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === activeColumnStringId
+          ? { ...col, cards: [...col.cards, newCard] }
+          : col,
+      ),
+    )
+  }
+
   return (
     <div className="bg-bg flex min-h-screen w-full flex-col text-gray-100">
       <h1 className="text-3xl-32-bold px-12 pt-6 pb-1 leading-19">
@@ -259,12 +223,17 @@ export default function DashboardClient({
         onDragCancel={handleDragCancel}
       >
         <div className="flex flex-1 gap-5 overflow-x-auto px-12 pb-10">
-          {columns.map((column) => (
+          {columns.map((column, colIndex) => (
             <Column
               key={column.id}
               id={column.id}
               title={column.title}
-              onAddCard={() => setIsCreateModalOpen(true)}
+              onAddCard={() => {
+                // 실제 컬럼의 ID를 모달에 전달
+                setActiveColumnId(Number(column.id))
+                setActiveColumnStringId(column.id)
+                setIsCreateModalOpen(true)
+              }}
             >
               {column.cards.map((card) => (
                 <Card
@@ -313,9 +282,15 @@ export default function DashboardClient({
         />
       )}
 
-      {/* 태크스 생성 모달 */}
+      {/* 태스크 생성 모달 */}
       {isCreateModalOpen && (
-        <TaskCreateModal onClose={() => setIsCreateModalOpen(false)} />
+        <TaskCreateModal
+          onClose={() => setIsCreateModalOpen(false)}
+          dashboardId={dashboardId}
+          columnId={activeColumnId}
+          members={members}
+          onCardCreated={handleCardCreated}
+        />
       )}
     </div>
   )
