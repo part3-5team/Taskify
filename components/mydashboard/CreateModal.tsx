@@ -21,13 +21,13 @@ export default function CreateModal({ onClose }: CreateModalProps) {
   const handleCreate = async (formData: FormData) => {
     const result = await createDashboard(formData)
 
-    if (!result.success) {
-      alert(result.error)
+    if (!result.success || !result.data) {
+      alert(result.error ?? '대시보드 생성에 실패했습니다.')
       return
     }
 
     onClose()
-    router.refresh()
+    router.push(`/dashboard/${result.data.id}`)
   }
   const [dashboardSubject, setDashboardSubject] = useState('')
   const isButtonDisabled = dashboardSubject.length === 0
