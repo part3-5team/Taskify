@@ -52,7 +52,7 @@ export default function InvitationContainer({
 
   return (
     <div className="flex flex-col gap-5 px-12 pb-12">
-      <div className="flex justify-between">
+      <div className="flex flex-col justify-between lg:flex lg:flex-row">
         <h2 className="text-xl-20-bold py-2">초대받은 대시보드</h2>
         <Input
           type="search"
