@@ -11,12 +11,14 @@ export default function DashboardCard({ dashboard }: { dashboard: Dashboard }) {
       href={`/dashboard/${dashboard.id}`}
       className="bg-black-300 text-2lg-18-bold hover:bg-black-200 box-border flex h-20 items-center justify-between gap-2.5 overflow-hidden rounded-[20px] border border-gray-700 px-5"
     >
-      <div className="flex min-w-0 items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         <IconHash
           style={{ color: dashboard.color }}
           className="h-5 w-5 shrink-0"
         />
-        <span className="truncate">{dashboard.title}</span>
+        <span className="wrap-break-words line-clamp-2 min-w-0 flex-1 leading-tight">
+          {dashboard.title}
+        </span>
         {dashboard.createdByMe && (
           <IconCrown className="text-brand-600 shrink-0" />
         )}
