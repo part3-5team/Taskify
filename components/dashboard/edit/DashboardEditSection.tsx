@@ -21,7 +21,7 @@ export default function DashboardEditSection({
   onBack,
 }: DashboardEditSectionProps) {
   return (
-    <section className="min-w-[375px] px-[20px] pt-[20px] md:min-w-[600px] md:pt-[30px] md:pl-[50px] lg:min-w-[1280px]">
+    <section className="min-w-[360px] px-[20px] pt-[20px] md:max-w-[1024px] md:min-w-[600px] md:pt-[30px] md:pl-[50px] lg:min-w-[1280px]">
       <div className="mb-8 flex items-start justify-between md:max-w-[800px]">
         <h1 className="md:text-3xl-32-bold text-xl-20-bold leading-[170%] font-bold text-white">
           대시보드 편집
