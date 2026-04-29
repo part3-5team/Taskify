@@ -268,7 +268,7 @@ export default function DashboardEditClient({
   return (
     <>
       <div className="bg-modal min-h-screen text-white">
-        <div className="flex min-h-screen w-full flex-col md:flex-row lg:min-w-[1280px]">
+        <div className="flex min-h-screen w-full flex-col md:flex-row">
           <div className="hidden md:block">
             <DashboardSidebar
               selectedTab={selectedTab}
