@@ -1,12 +1,14 @@
 'use client'
 
-import { ElementType } from 'react'
+import { ElementType, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Setting from '@/assets/icons/ic_setting.svg'
 import UserPlus from '@/assets/icons/ic_user_plus.svg'
 import Logout from '@/assets/icons/ic_logout.svg'
 import InviteMemberModal from './edit/InviteMemberModal'
 import useDashboardHeader from '@/libs/hooks/useDashboardHeader'
+import DashboardHeaderMemberList from './DashboardHeaderMemberList'
+import { getDashboardDetail } from '@/libs/api/dashboard/getDeashboardDetail'
 
 const BUTTON_STYLE =
   'hover:bg-modal active:bg-black-300 flex items-center gap-2 rounded-xs px-3 py-2.5 cursor-pointer text-gray-400 text-lg-16-medium transition-colors'
@@ -53,9 +55,34 @@ export default function Header() {
     handleLogout,
   } = useDashboardHeader()
 
+  const [isCreatedMyDashboard, setIsCreatedMyDashboard] = useState(false)
+
+  useEffect(() => {
+    let ignore = false
+
+    const fetchDetail = async () => {
+      const res = await getDashboardDetail(Number(dashboardId))
+
+      if (ignore) return
+
+      if (res.data) {
+        setIsCreatedMyDashboard(res.data.createdByMe)
+      }
+    }
+
+    fetchDetail()
+
+    return () => {
+      ignore = true
+    }
+  }, [dashboardId])
+
   return (
     <header className="bg-bg border-black-300 flex h-18 w-full items-center justify-end border-b-2 p-7.5">
       <nav className="flex gap-4">
+        {!isMyDashboard && (
+          <DashboardHeaderMemberList dashboardId={Number(dashboardId)} />
+        )}
         {isMyDashboard && (
           <HeaderActionButton
             onClick={handleLogout}
@@ -64,7 +91,7 @@ export default function Header() {
           />
         )}
 
-        {!isMyDashboard && (
+        {!isMyDashboard && isCreatedMyDashboard && (
           <>
             <HeaderActionButton
               href={`/dashboard/${dashboardId}/edit`}
