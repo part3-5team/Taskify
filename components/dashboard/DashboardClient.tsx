@@ -305,18 +305,19 @@ export default function DashboardClient({
       </DndContext>
 
       {/* 태스크 상세 모달 */}
-      {selectedTask && (
+      {/* {selectedTask && (
         <TaskDetailModal
-          task={selectedTask}
+          cardId={selectedTask.id}
+          dashboardId={dashboardId}
           columnTitle={selectedTaskColumnTitle}
           onClose={() => setSelectedTask(null)}
         />
-      )}
+      )} */}
 
       {/* 태크스 생성 모달 */}
-      {isCreateModalOpen && (
+      {/* {isCreateModalOpen && (
         <TaskCreateModal onClose={() => setIsCreateModalOpen(false)} />
-      )}
+      )} */}
     </div>
   )
 }

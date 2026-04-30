@@ -7,7 +7,6 @@ import Button from '@/components/common/button'
 import Input from '@/components/common/input'
 import PasswordChangeModal from './passwordChangeModal'
 import { updateMyInfo, uploadProfileImage } from '@/libs/api/user'
-import Image from 'next/image'
 
 interface ProfileEditModalProps {
   isOpen: boolean
@@ -174,7 +173,7 @@ export default function ProfileEditModal({
 
             <div className="mb-6 flex items-center gap-4 md:mb-[30px] md:gap-5">
               {displayImage ? (
-                <Image
+                <img
                   src={displayImage}
                   alt="profile"
                   className="size-[110px] shrink-0 rounded-full object-cover md:size-[120px]"

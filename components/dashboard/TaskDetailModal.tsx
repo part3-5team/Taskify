@@ -1,71 +1,210 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import ModalLayout from '@/components/common/modal/ModalLayout'
 import IconMore from '@/assets/icons/ic_more.svg'
 import IconX from '@/assets/icons/ic_X.svg'
 import PopdoverMenu from '@/components/common/PopdoverMenu'
 import CommentInput from '@/components/common/comment'
 import TaskEditModal from './TaskEditModal'
-
-interface TagData {
-  id: number
-  label: string
-}
-
-interface CardData {
-  id: string
-  title: string
-  tags?: TagData[]
-  dueDate?: string
-  assigneeName?: string
-  hasImage?: boolean
-}
+import { getCardDetail } from '@/libs/api/cards/getCardDetail'
+import type { CardDetail } from '@/libs/types/Card'
+import {
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+} from '@/libs/api/comment'
+import type { CommentData } from '@/libs/types/Comment'
 
 interface TaskDetailModalProps {
-  task: CardData
+  cardId: number
+  dashboardId: number
   columnTitle: string
   onClose: () => void
 }
 
-const INITIAL_COMMENTS = [
-  {
-    id: 1,
-    author: '김정은',
-    date: '2025년 7월 18일 오전 9:00',
-    content: 'Comment Text',
-    authorInitial: '정',
-  },
-]
-
 export default function TaskDetailModal({
-  task,
+  cardId,
   columnTitle,
   onClose,
+  dashboardId,
 }: TaskDetailModalProps) {
-  const [comments, setComments] = useState(INITIAL_COMMENTS)
+  const [card, setCard] = useState<CardDetail | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [comments, setComments] = useState<CommentData[]>([])
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
+  const [editingContent, setEditingContent] = useState('')
+
+  const [cursorId, setCursorId] = useState<number | null>(null)
+  const [hasMoreComments, setHasMoreComments] = useState(true)
+  const [isCommentLoading, setIsCommentLoading] = useState(false)
+
+  const observerRef = useRef<IntersectionObserver | null>(null)
+
   const [showMenu, setShowMenu] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  // 태그의 색상을 지정하는 헬퍼 함수
-  const getTagColor = (label: string) => {
-    if (label === '프로젝트') return 'bg-profile-blue text-white'
-    if (label === '일정') return 'bg-profile-yellow text-white'
-    if (label === '공부') return 'bg-profile-cyan text-white'
-    if (label === '버그') return 'bg-red-500 text-white'
+  useEffect(() => {
+    const fetchCardDetail = async () => {
+      try {
+        setIsLoading(true)
+
+        const data = await getCardDetail(cardId)
+        setCard(data)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCardDetail()
+  }, [cardId])
+
+  const fetchMoreComments = useCallback(async () => {
+    if (isCommentLoading || !hasMoreComments || cursorId === null) return
+
+    try {
+      setIsCommentLoading(true)
+
+      const data = await getComments({
+        cardId,
+        cursorId,
+        size: 10,
+      })
+
+      setComments((prev) => [...prev, ...data.comments])
+      setCursorId(data.cursorId)
+      setHasMoreComments(data.cursorId !== null)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setIsCommentLoading(false)
+    }
+  }, [cardId, cursorId, hasMoreComments, isCommentLoading])
+
+  useEffect(() => {
+    let ignore = false
+
+    const fetchInitialComments = async () => {
+      try {
+        setIsCommentLoading(true)
+
+        const data = await getComments({
+          cardId,
+          size: 10,
+        })
+
+        if (ignore) return
+
+        setComments(data.comments)
+        setCursorId(data.cursorId)
+        setHasMoreComments(data.cursorId !== null)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        if (!ignore) {
+          setIsCommentLoading(false)
+        }
+      }
+    }
+
+    fetchInitialComments()
+
+    return () => {
+      ignore = true
+    }
+  }, [cardId])
+
+  const lastCommentRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isCommentLoading) return
+
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMoreComments) {
+          fetchMoreComments()
+        }
+      })
+
+      if (node) {
+        observerRef.current.observe(node)
+      }
+    },
+    [fetchMoreComments, hasMoreComments, isCommentLoading],
+  )
+
+  const getTagColor = (tag: string) => {
+    if (tag === '프로젝트') return 'bg-profile-blue text-white'
+    if (tag === '일정') return 'bg-profile-yellow text-white'
+    if (tag === '공부') return 'bg-profile-cyan text-white'
+    if (tag === '버그') return 'bg-red-500 text-white'
+
     return 'bg-brand-500 text-white'
   }
 
-  const handleCreateComment = (value: string) => {
-    const newComment = {
-      id: Date.now(),
-      author: '박보검',
-      date: new Date().toLocaleString(),
-      content: value,
-      authorInitial: '박',
+  const handleCreateComment = async (value: string) => {
+    if (!card) return
+
+    try {
+      const newComment = await createComment({
+        content: value,
+        cardId,
+        columnId: card.columnId,
+        dashboardId,
+      })
+
+      setComments((prev) => [newComment, ...prev])
+    } catch (err) {
+      console.error(err)
     }
-    setComments((prev) => [newComment, ...prev])
   }
+
+  const handleUpdateComment = async (commentId: number) => {
+    try {
+      const updatedComment = await updateComment({
+        commentId,
+        content: editingContent,
+      })
+
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment.id === commentId ? updatedComment : comment,
+        ),
+      )
+
+      setEditingCommentId(null)
+      setEditingContent('')
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleDeleteComment = async (commentId: number) => {
+    try {
+      await deleteComment(commentId)
+
+      setComments((prev) => prev.filter((comment) => comment.id !== commentId))
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <ModalLayout onClose={onClose}>
+        <div className="p-10 text-center text-gray-400">로딩중...</div>
+      </ModalLayout>
+    )
+  }
+
+  if (!card) return null
+
+  const tags: string[] = card.tags
 
   return (
     <>
@@ -73,20 +212,20 @@ export default function TaskDetailModal({
         onClose={onClose}
         className="flex w-full max-w-[730px] flex-col overflow-hidden text-left md:flex-row"
       >
-        {/* 1. 메인 콘텐츠 영역 (왼쪽) */}
         <div className="flex-1 p-7.5">
           <div className="mb-4 flex items-start justify-between">
-            <h2 className="text-2xl-24-bold text-gray-100">{task.title}</h2>
+            <h2 className="text-2xl-24-bold text-gray-100">{card.title}</h2>
 
-            {/* 모바일용 헤더 버튼 (md:hidden) */}
             <div className="flex gap-2 md:hidden">
               <div className="relative">
                 <button
+                  type="button"
                   onClick={() => setShowMenu(!showMenu)}
                   className="flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-100"
                 >
                   <IconMore className="h-4 w-4" />
                 </button>
+
                 {showMenu && (
                   <div className="absolute top-full right-0 z-10 mt-1">
                     <PopdoverMenu
@@ -100,7 +239,9 @@ export default function TaskDetailModal({
                   </div>
                 )}
               </div>
+
               <button
+                type="button"
                 onClick={onClose}
                 className="flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-100"
               >
@@ -109,15 +250,14 @@ export default function TaskDetailModal({
             </div>
           </div>
 
-          {/* 태그 리스트 */}
-          {task.tags && task.tags.length > 0 && (
+          {tags.length > 0 && (
             <div className="mb-6 flex flex-wrap gap-1.5 border-b border-gray-700 pb-6">
-              {task.tags.map((tag) => (
+              {tags.map((tag) => (
                 <span
-                  key={tag.id}
-                  className={`text-xs-12-medium rounded px-2 py-0.5 ${getTagColor(tag.label)}`}
+                  key={tag}
+                  className={`text-xs-12-medium rounded px-2 py-0.5 ${getTagColor(tag)}`}
                 >
-                  {tag.label}
+                  {tag}
                 </span>
               ))}
             </div>
@@ -125,41 +265,51 @@ export default function TaskDetailModal({
 
           <div className="mb-6">
             <p className="text-md-15-medium leading-relaxed whitespace-pre-wrap text-gray-300">
-              먼저 전체 플로우를 개괄적으로 파악하고, 주요 화면 구성을 나열 초기
-              와이어프레임은 빠르게 그리고, 이후 단계에서 세부 요소를
-              보완합니다.
+              {card.description}
             </p>
           </div>
 
-          {/* task 이미지 예시 */}
-          {task.hasImage && (
-            <div className="bg-black-200 mb-6 flex h-[260px] items-center justify-center rounded-xl border border-gray-700 p-8">
-              <div className="flex h-full w-full items-center justify-center rounded-lg border-2 border-dashed border-gray-600 bg-gray-800">
-                <span className="text-gray-500">Image Area</span>
-              </div>
-            </div>
+          {card.imageUrl && (
+            <img
+              src={card.imageUrl}
+              alt="할 일 카드 이미지"
+              className="mb-6 h-[260px] w-full rounded-xl object-cover"
+            />
           )}
 
           <div className="mt-6 md:hidden">
             <hr className="mb-6 border-gray-700" />
+
             <div className="mb-8 grid grid-cols-2 gap-6 lg:grid-cols-3">
               <div>
                 <h4 className="mb-2 text-[10px] font-bold text-gray-500 uppercase">
                   담당자
                 </h4>
+
                 <div className="flex items-center gap-2">
-                  <div className="bg-profile-green flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white">
-                    {task.assigneeName?.charAt(0) || 'U'}
-                  </div>
+                  {card.assignee.profileImageUrl ? (
+                    <img
+                      src={card.assignee.profileImageUrl}
+                      alt="담당자 프로필"
+                      className="h-6 w-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="bg-profile-green flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white">
+                      {card.assignee.nickname.charAt(0)}
+                    </div>
+                  )}
+
                   <span className="text-xs-12-medium text-gray-200">
-                    {task.assigneeName || '미지정'}
+                    {card.assignee.nickname}
                   </span>
                 </div>
               </div>
+
               <div>
                 <h4 className="mb-2 text-[10px] font-bold text-gray-500 uppercase">
                   상태
                 </h4>
+
                 <div className="flex items-center gap-2">
                   <div className="bg-profile-violet h-1.5 w-1.5 rounded-full" />
                   <span className="text-xs-12-medium text-gray-200">
@@ -167,62 +317,136 @@ export default function TaskDetailModal({
                   </span>
                 </div>
               </div>
+
               <div>
                 <h4 className="mb-2 text-[10px] font-bold text-gray-500 uppercase">
                   마감일
                 </h4>
+
                 <p className="text-xs-12-medium text-gray-200">
-                  {task.dueDate || '미정'}
+                  {card.dueDate || '미정'}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 댓글 입력 영역 (공용 컴포넌트 사용) */}
           <div className="mb-6">
             <CommentInput profileName="정" onSubmit={handleCreateComment} />
           </div>
 
-          {/* 댓글 리스트 영역 */}
           <div className="space-y-4">
-            {comments.map((c) => (
-              <div key={c.id} className="flex gap-3">
-                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
-                  {c.authorInitial}
-                </div>
-                <div className="flex-1">
-                  <div className="mb-1 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs-12-semibold text-gray-100">
-                        {c.author}
-                      </span>
-                      <span className="text-[10px] text-gray-600">
-                        {c.date}
-                      </span>
+            {comments.map((comment, idx) => {
+              const isEditing = editingCommentId === comment.id
+              const isLastComment = idx === comments.length - 1
+
+              return (
+                <div
+                  key={comment.id}
+                  ref={isLastComment ? lastCommentRef : null}
+                  className="flex gap-3"
+                >
+                  {comment.author.profileImageUrl ? (
+                    <img
+                      src={comment.author.profileImageUrl}
+                      alt="댓글 작성자 프로필"
+                      className="h-6 w-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                      {comment.author.nickname.charAt(0)}
                     </div>
-                    <div className="flex gap-2 text-[10px] text-gray-600">
-                      <button className="hover:underline">수정</button>
-                      <button className="hover:underline">삭제</button>
+                  )}
+
+                  <div className="flex-1">
+                    <div className="mb-1 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs-12-semibold text-gray-100">
+                          {comment.author.nickname}
+                        </span>
+
+                        <span className="text-[10px] text-gray-600">
+                          {new Date(comment.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-2 text-[10px] text-gray-600">
+                        <button
+                          type="button"
+                          className="hover:underline"
+                          onClick={() => {
+                            setEditingCommentId(comment.id)
+                            setEditingContent(comment.content)
+                          }}
+                        >
+                          수정
+                        </button>
+
+                        <button
+                          type="button"
+                          className="hover:underline"
+                          onClick={() => handleDeleteComment(comment.id)}
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </div>
+
+                    {isEditing ? (
+                      <div className="flex gap-2">
+                        <input
+                          value={editingContent}
+                          onChange={(e) => setEditingContent(e.target.value)}
+                          className="bg-black-400 flex-1 rounded border border-gray-700 px-3 py-2 text-sm text-gray-100 outline-none"
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateComment(comment.id)}
+                          className="text-xs-12-semibold text-brand-500"
+                        >
+                          저장
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingCommentId(null)
+                            setEditingContent('')
+                          }}
+                          className="text-xs-12-semibold text-gray-500"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-sm-13-medium text-gray-200">
+                        {comment.content}
+                      </p>
+                    )}
                   </div>
-                  <p className="text-sm-13-medium text-gray-200">{c.content}</p>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
+
+          {isCommentLoading && (
+            <div className="text-xs-12-medium py-4 text-center text-gray-500">
+              댓글 불러오는 중...
+            </div>
+          )}
         </div>
 
-        {/* 2. 사이드바 영역 (데스크탑 전용) */}
         <div className="hidden w-[180px] border-l border-gray-700 p-5 md:block">
           <div className="mb-6 flex justify-end gap-2">
-            {/* 더보기 버튼 및 메뉴 */}
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setShowMenu(!showMenu)}
                 className="flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-100"
               >
                 <IconMore className="h-4 w-4" />
               </button>
+
               {showMenu && (
                 <div className="absolute top-full right-0 z-10 mt-1">
                   <PopdoverMenu
@@ -236,7 +460,9 @@ export default function TaskDetailModal({
                 </div>
               )}
             </div>
+
             <button
+              type="button"
               onClick={onClose}
               className="flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-100"
             >
@@ -245,26 +471,35 @@ export default function TaskDetailModal({
           </div>
 
           <div className="space-y-6">
-            {/* 담당자 섹션 */}
             <div>
               <h4 className="mb-2 text-[10px] font-bold text-gray-500 uppercase">
                 담당자
               </h4>
+
               <div className="flex items-center gap-2">
-                <div className="bg-profile-green flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white">
-                  {task.assigneeName?.charAt(0) || 'U'}
-                </div>
+                {card.assignee.profileImageUrl ? (
+                  <img
+                    src={card.assignee.profileImageUrl}
+                    alt="담당자 프로필"
+                    className="h-6 w-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="bg-profile-green flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white">
+                    {card.assignee.nickname.charAt(0)}
+                  </div>
+                )}
+
                 <span className="text-xs-12-medium text-gray-200">
-                  {task.assigneeName || '미지정'}
+                  {card.assignee.nickname}
                 </span>
               </div>
             </div>
 
-            {/* 상태 섹션 */}
             <div>
               <h4 className="mb-2 text-[10px] font-bold text-gray-500 uppercase">
                 상태
               </h4>
+
               <div className="flex items-center gap-2">
                 <div className="bg-profile-violet h-1.5 w-1.5 rounded-full" />
                 <span className="text-xs-12-medium text-gray-200">
@@ -273,18 +508,19 @@ export default function TaskDetailModal({
               </div>
             </div>
 
-            {/* 마감일 섹션 */}
             <div>
               <h4 className="mb-2 text-[10px] font-bold text-gray-500 uppercase">
                 마감일
               </h4>
+
               <p className="text-xs-12-medium text-gray-200">
-                {task.dueDate || '미정'}
+                {card.dueDate || '미정'}
               </p>
             </div>
           </div>
         </div>
       </ModalLayout>
+
       {isEditModalOpen && (
         <TaskEditModal onClose={() => setIsEditModalOpen(false)} />
       )}
