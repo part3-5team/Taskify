@@ -37,9 +37,13 @@ export default function CreateModal({ onClose }: CreateModalProps) {
   const [selectedColor, setSelectedColor] = useState<ColorType>('rose')
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      onClick={onClose}
+    >
       <form
         action={handleCreate}
+        onClick={(e) => e.stopPropagation()}
         className="bg-modal relative flex w-150 flex-col gap-5 rounded-3xl border-gray-600 p-7.5 text-gray-300"
       >
         <p className="text-2xl-24-semibold mb-2.5">새 대시보드 생성</p>
