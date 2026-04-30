@@ -10,6 +10,7 @@ import useDashboardHeader from '@/libs/hooks/useDashboardHeader'
 import DashboardHeaderMemberList from './DashboardHeaderMemberList'
 import { getDashboardDetail } from '@/libs/api/dashboard/getDeashboardDetail'
 import MobileSideMenuButton from '@/assets/icons/ic_sidemenu.svg'
+import LogoutModal from '../common/modal/LogoutModal'
 
 const BUTTON_STYLE =
   'hover:bg-modal active:bg-black-300 flex items-center gap-2 rounded-xs px-3 py-2.5 cursor-pointer text-gray-400 text-lg-16-medium transition-colors'
@@ -76,6 +77,7 @@ export default function Header() {
   } = useDashboardHeader()
 
   const [isCreatedMyDashboard, setIsCreatedMyDashboard] = useState(false)
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
   useEffect(() => {
     let ignore = false
@@ -112,7 +114,7 @@ export default function Header() {
         )}
         {isMyDashboard && (
           <HeaderActionButton
-            onClick={handleLogout}
+            onClick={() => setIsLogoutModalOpen(true)}
             icon={Logout}
             label="로그아웃"
             isLogout
@@ -139,6 +141,13 @@ export default function Header() {
           onClose={() => setInviteModalOpen(false)}
           onSubmit={handleInvite}
         />
+
+        {isLogoutModalOpen && (
+          <LogoutModal
+            onClose={() => setIsLogoutModalOpen(false)}
+            onLogout={handleLogout}
+          />
+        )}
       </nav>
     </header>
   )
