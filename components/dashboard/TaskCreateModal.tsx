@@ -1,10 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useState, useRef, useTransition, useMemo } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import { ko } from 'date-fns/locale'
 import ModalLayout from '@/components/common/modal/ModalLayout'
 import Input from '@/components/common/input'
 import TextArea from '@/components/common/textArea'
-import Dropdown from '@/components/common/dropdown/Dropdown'
+import Dropdown, { DropdownUser } from '@/components/common/dropdown/Dropdown'
 import Button from '@/components/common/button'
 import IconX from '@/assets/icons/ic_X.svg'
 import IconImage from '@/assets/icons/ic_image.svg'
@@ -15,51 +19,113 @@ interface TaskCreateModalProps {
   dashboardId: number
   columnId: number
   onClose: () => void
-  onCreate?: (card: CardDetail) => void
+  dashboardId: number
+  columnId: number
+  members: Member[]
+  onCardCreated?: (card: Card, columnId: number) => void
 }
 
 export default function TaskCreateModal({
+  onClose,
   dashboardId,
   columnId,
-  onClose,
-  onCreate,
+  members,
+  onCardCreated,
 }: TaskCreateModalProps) {
+  const [isPending, startTransition] = useTransition()
+
+  // 폼 상태
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [dueDate, setDueDate] = useState('')
-  const [tagInput, setTagInput] = useState('')
-  const [tags, setTags] = useState<string[]>([])
-  const [imageUrl, setImageUrl] = useState('')
+  const [dueDate, setDueDate] = useState<Date | null>(null)
   const [assigneeUserId, setAssigneeUserId] = useState<number | undefined>()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [tags, setTags] = useState<string[]>([])
+  const [tagInput, setTagInput] = useState('')
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const isValid = title.trim() !== '' && description.trim() !== ''
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter') return
+  // 담당자 드롭다운용 유저 목록 (초대된 멤버만)
+  const dropdownUsers: DropdownUser[] = useMemo(
+    () =>
+      members.map((m) => ({
+        id: m.userId,
+        nickname: m.nickname,
+        profileImageUrl: m.profileImageUrl,
+      })),
+    [members],
+  )
 
-    e.preventDefault()
+  // 필수 입력 완료 여부 → 생성 버튼 활성화
+  const isFormValid =
+    title.trim().length > 0 &&
+    description.trim().length > 0 &&
+    dueDate !== null &&
+    assigneeUserId !== undefined
 
-    const nextTag = tagInput.trim()
-
-    if (!nextTag) return
-    if (tags.includes(nextTag)) return
-
-    setTags((prev) => [...prev, nextTag])
-    setTagInput('')
+  // 태그 입력 처리 (Enter)
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const trimmed = tagInput.trim()
+      if (trimmed && !tags.includes(trimmed)) {
+        setTags((prev) => [...prev, trimmed])
+      }
+      setTagInput('')
+    }
   }
 
   const handleRemoveTag = (tag: string) => {
-    setTags((prev) => prev.filter((item) => item !== tag))
+    setTags((prev) => prev.filter((t) => t !== tag))
   }
 
-  const handleSubmit = async () => {
-    if (!isValid || isSubmitting) return
+  // 이미지 선택 처리 (최대 1개)
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    // 기존 미리보기 URL 해제
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    // input value 초기화 (같은 파일 재선택 가능하도록)
+    e.target.value = ''
+  }
 
-    try {
-      setIsSubmitting(true)
+  const handleRemoveImage = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
+    setImageFile(null)
+    setImagePreview(null)
+  }
 
-      const newCard = await createCard({
+  // 날짜 → API 형식 변환 ("YYYY-MM-DD HH:mm")
+  const formatDueDate = (date: Date): string => {
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+  }
+
+  // 생성 제출
+  const handleSubmit = () => {
+    if (!isFormValid) return
+    setError(null)
+
+    startTransition(async () => {
+      let imageUrl: string | undefined
+
+      // 이미지 있으면
+      if (imageFile) {
+        const uploadResult = await uploadCardImage(columnId, imageFile)
+        if (!uploadResult.success) {
+          setError(uploadResult.error ?? '이미지 업로드에 실패했습니다.')
+          return
+        }
+        imageUrl = uploadResult.data?.imageUrl
+      }
+
+      // 할일 카드 생성
+      const result = await createCard({
         dashboardId,
         columnId,
         title: title.trim(),
@@ -83,7 +149,7 @@ export default function TaskCreateModal({
   return (
     <ModalLayout
       onClose={onClose}
-      className="bg-modal w-full max-w-[500px] overflow-hidden rounded-2xl p-7 text-left"
+      className="bg-modal w-full max-w-[500px] overflow-y-auto rounded-2xl p-7 text-left"
     >
       <div className="mb-8 flex items-center justify-between">
         <h2 className="text-2xl-24-bold text-gray-100">할 일 생성</h2>
@@ -124,9 +190,10 @@ export default function TaskCreateModal({
         </div>
 
         <div className="flex gap-4">
+          {/* 마감일 - react-datepicker */}
           <div className="flex-1">
             <label className="mb-2 block text-sm font-semibold text-gray-100">
-              마감일
+              마감일<span className="text-brand-500 ml-0.5">*</span>
             </label>
 
             <Input
@@ -138,7 +205,7 @@ export default function TaskCreateModal({
 
           <div className="flex-1">
             <label className="mb-2 block text-sm font-semibold text-gray-100">
-              담당자
+              담당자<span className="text-brand-500 ml-0.5">*</span>
             </label>
 
             <Dropdown />
@@ -193,7 +260,12 @@ export default function TaskCreateModal({
         </div>
 
         <div className="mt-8 flex gap-3">
-          <Button variant="cancel" className="flex-1" onClick={onClose}>
+          <Button
+            variant="cancel"
+            className="flex-1"
+            onClick={onClose}
+            disabled={isPending}
+          >
             취소
           </Button>
 

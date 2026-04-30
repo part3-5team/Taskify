@@ -52,6 +52,8 @@ type ColumnData = {
 export default function DashboardClient({
   dashboardId,
   dashboardTitle,
+  members,
+  initialServerColumns,
 }: DashboardClientProps) {
   const [columns, setColumns] = useState<ColumnData[]>([])
   const [activeCardData, setActiveCardData] = useState<CardData | null>(null)
@@ -130,6 +132,26 @@ export default function DashboardClient({
     const cardId = active.id as number
     const targetId = over.id as number
 
+    // API 호출을 위해 미리 타겟 컬럼 ID 계산
+    let targetColumnId: string | null = null
+    const isTargetColumn = columns.some((col) => col.id === targetId)
+    if (isTargetColumn) {
+      targetColumnId = targetId
+    } else {
+      for (const col of columns) {
+        if (col.cards.some((c) => c.id === targetId)) {
+          targetColumnId = col.id
+          break
+        }
+      }
+    }
+
+    if (targetColumnId) {
+      updateCard(Number(cardId), { columnId: Number(targetColumnId) }).catch(
+        (err) => console.error('카드 이동 실패:', err),
+      )
+    }
+
     setColumns((prevCols) => {
       // 1. 기존 위치 파악하기 (위에서 아래로 드래그하는 경우인지 판별용)
       let sourceColOriginal = -1
@@ -206,12 +228,30 @@ export default function DashboardClient({
       title,
       cards: [],
     }
-    setColumns((prev) => [...prev, newColumn])
   }
 
   const handleTaskClick = (task: CardData, columnTitle: string) => {
     setSelectedTask(task)
     setSelectedTaskColumnTitle(columnTitle)
+  }
+
+  // 카드 생성 성공 시 해당 컬럼에 즉시 추가
+  const handleCardCreated = (card: import('@/libs/types/Dashboard').Card) => {
+    const newCard: CardData = {
+      id: String(card.id),
+      title: card.title,
+      tags: card.tags.map((label, idx) => ({ id: idx, label })),
+      dueDate: card.dueDate ?? undefined,
+      assigneeName: card.assignee?.nickname,
+      hasImage: !!card.imageUrl,
+    }
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === activeColumnStringId
+          ? { ...col, cards: [...col.cards, newCard] }
+          : col,
+      ),
+    )
   }
 
   return (
