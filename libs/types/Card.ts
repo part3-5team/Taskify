@@ -15,3 +15,9 @@ export interface CardDetail {
   createdAt: string
   updatedAt: string
 }
+
+export interface CardListResponse {
+  cursorId: number | null
+  totalCount: number
+  cards: CardDetail[]
+}
