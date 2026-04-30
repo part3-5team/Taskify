@@ -4,6 +4,7 @@ import SettingIcon from '@/assets/icons/ic_setting.svg'
 import { useEffect, useState } from 'react'
 import ProfileEditModal from '../auth/AuthModal/MyPage/profileEditModal'
 import { getMyInfo } from '@/libs/api/user'
+import DefaultProfileImg from '@/assets/imgs/img_default_profile.svg'
 
 interface User {
   email: string
@@ -38,9 +39,7 @@ export default function SidebarFooter() {
             className="h-8 w-8 shrink-0 rounded-full object-cover"
           />
         ) : (
-          <div className="bg-brand-300 text-md-14-medium flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white">
-            {user?.nickname.slice(0, 1) || '?'}
-          </div>
+          <DefaultProfileImg className="size-7 rounded-full bg-white md:size-8" />
         )}
       </button>
 
