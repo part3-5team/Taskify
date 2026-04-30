@@ -16,7 +16,7 @@ export default async function SideMenu() {
     <aside className="bg-black-500 sidebar absolute z-50 mx-auto box-border hidden h-full shrink-0 flex-col border-r border-gray-900 py-2 md:static md:flex md:w-[220px] md:w-[clamp(200px,calc(50.78vw-190px),330px)]">
       <SidebarHeader />
       <SidebarDashboardList dashboards={dashboards} />
-      <div className="mt-auto">
+      <div className="mt-auto min-w-0">
         <SidebarFooter />
       </div>
     </aside>

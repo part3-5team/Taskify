@@ -31,6 +31,7 @@ export default function SidebarDashboardList({
               label={dashboard.title}
               href={`/dashboard/${dashboard.id}`}
               color={dashboard.color}
+              createdByMe={dashboard.createdByMe}
             />
           ))}
         </ul>
