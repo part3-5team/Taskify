@@ -9,6 +9,7 @@ import InviteMemberModal from './edit/InviteMemberModal'
 import useDashboardHeader from '@/libs/hooks/useDashboardHeader'
 import DashboardHeaderMemberList from './DashboardHeaderMemberList'
 import { getDashboardDetail } from '@/libs/api/dashboard/getDeashboardDetail'
+import MobileSideMenuButton from '@/assets/icons/ic_sidemenu.svg'
 
 const BUTTON_STYLE =
   'hover:bg-modal active:bg-black-300 flex items-center gap-2 rounded-xs px-3 py-2.5 cursor-pointer text-gray-400 text-lg-16-medium transition-colors'
@@ -18,16 +19,18 @@ const HeaderActionButton = ({
   href,
   icon: Icon,
   label,
+  isLogout,
 }: {
   onClick?: () => void
   href?: string
   icon: ElementType
   label: string
+  isLogout?: boolean
 }) => {
   const content = (
     <>
       <Icon aria-label={`${label} 아이콘`} />
-      {label}
+      <span className={`${!isLogout && `hidden md:block`}`}>{label}</span>
     </>
   )
 
@@ -41,6 +44,23 @@ const HeaderActionButton = ({
   return (
     <button onClick={onClick} className={BUTTON_STYLE}>
       {content}
+    </button>
+  )
+}
+
+const DashboardMobileButton = () => {
+  const handleSideMenuClick = () => {
+    const sidebars = document.querySelectorAll('.sidebar')
+
+    sidebars.forEach((el) => {
+      el.classList.toggle('hidden')
+      el.classList.add('flex')
+    })
+  }
+
+  return (
+    <button onClick={handleSideMenuClick} className="text-gray-300 md:hidden">
+      <MobileSideMenuButton />
     </button>
   )
 }
@@ -60,6 +80,13 @@ export default function Header() {
   useEffect(() => {
     let ignore = false
 
+    const sidebars = document.querySelectorAll('.sidebar')
+
+    sidebars.forEach((el) => {
+      el.classList.toggle('hidden')
+      el.classList.add('flex')
+    })
+
     const fetchDetail = async () => {
       const res = await getDashboardDetail(Number(dashboardId))
 
@@ -78,7 +105,8 @@ export default function Header() {
   }, [dashboardId])
 
   return (
-    <header className="bg-bg border-black-300 flex h-18 w-full items-center justify-end border-b-2 p-7.5">
+    <header className="bg-bg border-black-300 flex h-18 w-full items-center justify-between border-b-2 p-7.5 md:justify-end">
+      <DashboardMobileButton />
       <nav className="flex gap-4">
         {!isMyDashboard && (
           <DashboardHeaderMemberList dashboardId={Number(dashboardId)} />
@@ -88,6 +116,7 @@ export default function Header() {
             onClick={handleLogout}
             icon={Logout}
             label="로그아웃"
+            isLogout
           />
         )}
 
