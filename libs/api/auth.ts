@@ -111,5 +111,5 @@ export const logout = async () => {
 
   cookieStore.delete('accessToken')
 
-  redirect('/login')
+  redirect('/')
 }
