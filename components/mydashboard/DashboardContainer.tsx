@@ -15,7 +15,9 @@ export default function DashboardContainer({
     <section className="flex flex-col gap-5 px-12 pb-12">
       <h2 className="text-xl-20-bold py-2">내 대시보드</h2>
       {hasDashboards ? (
-        <DashboardList dashboards={dashboards} />
+        <>
+          <DashboardList dashboards={dashboards} />
+        </>
       ) : (
         <EmptyMyDashboard />
       )}

@@ -1,4 +1,5 @@
 import { Invitation } from '@/libs/types/Dashboard'
+import Button from '@/components/common/button'
 
 interface InvitationListProps {
   invitations: Invitation[]
@@ -35,20 +36,24 @@ export default function InvitationList({
               </p>
               <div className="text-lg-16-semibold flex shrink-0 justify-end gap-2 text-white md:justify-center">
                 {/* 받은 초대 거절/수락 */}
-                <button
+                <Button
                   type="button"
+                  variant="cancel"
+                  size="sm"
                   onClick={() => onRespondInvitation(invitation.id, false)}
-                  className="hover:bg-black-200 text-lg-14-semibold md:text-lg-16-semibold h-7 w-12 cursor-pointer rounded-full bg-gray-900 md:h-8 md:w-14"
+                  className="whitespace-nowrap"
                 >
                   거절
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="primary"
+                  size="sm"
                   onClick={() => onRespondInvitation(invitation.id, true)}
-                  className="bg-brand-500 hover:bg-brand-600 text-lg-14-semibold md:text-lg-16-semibold h-7 w-12 cursor-pointer rounded-full md:h-8 md:w-14"
+                  className="whitespace-nowrap"
                 >
                   수락
-                </button>
+                </Button>
               </div>
             </div>
           </div>

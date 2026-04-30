@@ -51,7 +51,7 @@ export default function InvitationContainer({
   const isSearching = searchKeyword.length > 0
 
   return (
-    <div className="flex flex-col gap-5 px-12 pb-12">
+    <section className="flex flex-col gap-5 px-12 pb-12">
       <div className="flex flex-col justify-between lg:flex lg:flex-row">
         <h2 className="text-xl-20-bold py-2">초대받은 대시보드</h2>
         <Input
@@ -80,6 +80,6 @@ export default function InvitationContainer({
           검색 결과가 없습니다.
         </div>
       )}
-    </div>
+    </section>
   )
 }
