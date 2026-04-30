@@ -1,11 +1,8 @@
-type User = {
-  id: number
-  name: string
-}
+import { DropdownUser } from './Dropdown'
 
 type DropdownListProps = {
-  users: User[]
-  onSelect: (user: User) => void
+  users: DropdownUser[]
+  onSelect: (user: DropdownUser) => void
 }
 
 export default function DropdownList({ users, onSelect }: DropdownListProps) {
@@ -17,7 +14,7 @@ export default function DropdownList({ users, onSelect }: DropdownListProps) {
           onClick={() => onSelect(user)}
           className="flex h-10 cursor-pointer items-center px-4 hover:bg-gray-700"
         >
-          {user.name}
+          {user.nickname || user.name}
         </div>
       ))}
     </div>

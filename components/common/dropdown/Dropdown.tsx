@@ -16,9 +16,11 @@ const mockUsers = [
   { id: 10, name: '강수지' },
 ]
 
-type User = {
+export type DropdownUser = {
   id: number
-  name: string
+  name?: string
+  nickname?: string
+  profileImageUrl?: string | null
 }
 
 type DropdownSize = 'sm' | 'md'
@@ -26,10 +28,18 @@ type DropdownState = 'normal' | 'active' | 'complete'
 
 type DropdownMenuProps = {
   size?: DropdownSize
+  users?: DropdownUser[]
+  onSelect?: (user: DropdownUser) => void
+  placeholder?: string
 }
 
-export default function DropdownMenu({ size = 'md' }: DropdownMenuProps) {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+export default function DropdownMenu({
+  size = 'md',
+  users = mockUsers,
+  onSelect,
+  placeholder = '담당자 선택',
+}: DropdownMenuProps) {
+  const [selectedUser, setSelectedUser] = useState<DropdownUser | null>(null)
   const [isDropdownOpen, setIsDropDownOpen] = useState(false)
 
   const visualState: DropdownState = isDropdownOpen
@@ -42,22 +52,30 @@ export default function DropdownMenu({ size = 'md' }: DropdownMenuProps) {
     setIsDropDownOpen((prev) => !prev)
   }
 
-  const handleSelectUser = (user: User) => {
+  const handleSelectUser = (user: DropdownUser) => {
     setSelectedUser(user)
     setIsDropDownOpen(false)
+    if (onSelect) {
+      onSelect(user)
+    }
   }
+
+  // 화면에 표시할 이름 (nickname 또는 name)
+  const displayLabel = selectedUser
+    ? selectedUser.nickname || selectedUser.name
+    : placeholder
 
   return (
     <div className="relative w-full">
       <DropdownButton
         size={size}
         visualState={visualState}
-        selectedLabel={selectedUser ? selectedUser.name : '담당자 선택'}
+        selectedLabel={displayLabel || placeholder}
         onClick={handleToggleDropdown}
       />
 
       {isDropdownOpen && (
-        <DropdownList users={mockUsers} onSelect={handleSelectUser} />
+        <DropdownList users={users} onSelect={handleSelectUser} />
       )}
     </div>
   )
