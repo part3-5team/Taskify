@@ -4,15 +4,10 @@ import React from 'react'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import DefaultProfileImg from '@/assets/imgs/img_default_profile.svg'
 
-interface TagData {
-  id: number
-  label: string
-}
-
 interface TaskCardProps {
   id: number | string
   title: string
-  tags?: TagData[]
+  tags?: string[]
   dueDate?: string
   assigneeName?: string
   assigneeProfileImageUrl?: string | null
@@ -90,24 +85,24 @@ export default function TaskCard({
       {/* 3. 태그 뱃지 */}
       {tags.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-1.5">
-          {tags.map((tag) => {
+          {tags.map((tag, idx) => {
             let colorClasses = 'bg-brand-500 text-white'
 
-            if (tag.label === '프로젝트')
+            if (tag === '프로젝트')
               colorClasses = 'bg-profile-blue text-white'
-            else if (tag.label === '일정')
+            else if (tag === '일정')
               colorClasses = 'bg-profile-yellow text-white'
-            else if (tag.label === '공부')
+            else if (tag === '공부')
               colorClasses = 'bg-profile-cyan text-white'
-            else if (tag.label === '버그')
+            else if (tag === '버그')
               colorClasses = 'bg-red-500 text-white'
 
             return (
               <span
-                key={`${tag.id}-${tag.label}`}
+                key={`${idx}-${tag}`}
                 className={`text-xs-12-medium rounded px-2 py-0.5 ${colorClasses}`}
               >
-                {tag.label}
+                {tag}
               </span>
             )
           })}
