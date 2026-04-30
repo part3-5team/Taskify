@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import InvitationContainer from '@/components/mydashboard/InvitationContainer'
 import DashboardContainer from '@/components/mydashboard/DashboardContainer'
 import { getInvitations } from '@/libs/api/dashboard/getInvitations'
