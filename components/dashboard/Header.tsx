@@ -83,8 +83,7 @@ export default function Header() {
     const sidebars = document.querySelectorAll('.sidebar')
 
     sidebars.forEach((el) => {
-      el.classList.toggle('hidden')
-      el.classList.add('flex')
+      el.classList.add('hidden')
     })
 
     const fetchDetail = async () => {
