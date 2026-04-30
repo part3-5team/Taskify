@@ -15,21 +15,29 @@ import Card from '@/components/dashboard/TaskCard'
 import AddColumnButton from '@/components/dashboard/AddColumnButton'
 import TaskDetailModal from '@/components/dashboard/TaskDetailModal'
 import TaskCreateModal from '@/components/dashboard/TaskCreateModal'
+import { createColumn } from '@/libs/api/column/createColumn'
+import { updateCard } from '@/libs/api/card/updateCard'
+import {
+  Member,
+  Column as ServerColumn,
+  Card as ServerCard,
+} from '@/libs/types/Dashboard'
+
+export interface ServerColumnWithCards extends ServerColumn {
+  serverCards: ServerCard[]
+}
 
 interface DashboardClientProps {
   dashboardId: number
   dashboardTitle: string
-}
-
-type TagData = {
-  id: number
-  label: string
+  members: Member[]
+  initialServerColumns: ServerColumnWithCards[]
 }
 
 type CardData = {
   id: string
   title: string
-  tags?: TagData[]
+  tags?: string[]
   dueDate?: string
   assigneeName?: string
   hasImage?: boolean
@@ -41,106 +49,51 @@ type ColumnData = {
   cards: CardData[]
 }
 
-const initialColumns: ColumnData[] = [
-  {
-    id: 'todo',
-    title: 'To-do',
-    cards: [
-      {
-        id: 'card-1',
-        title: '기능 설정',
-        tags: [{ id: 1, label: '버그' }],
-        dueDate: '2024-07-01',
-        assigneeName: '최유현',
-      },
-      {
-        id: 'card-2',
-        title: '기능 설정',
-        tags: [
-          { id: 1, label: '버그' },
-          { id: 2, label: '프로젝트' },
-        ],
-        dueDate: '2024-07-01',
-        assigneeName: '김개발',
-      },
-      {
-        id: 'card-3',
-        title: '기능 설정',
-        tags: [
-          { id: 1, label: '디자인' },
-          { id: 2, label: '일정' },
-          { id: 3, label: '프로젝트' },
-        ],
-        dueDate: '2024-07-01',
-        assigneeName: '김개발',
-        hasImage: true,
-      },
-    ],
-  },
-  {
-    id: 'on-progress',
-    title: 'On Progress',
-    cards: [
-      {
-        id: 'card-4',
-        title: '기능 설정',
-        tags: [{ id: 1, label: '버그' }],
-        dueDate: '2024-07-01',
-        assigneeName: '최유현',
-      },
-      {
-        id: 'card-5',
-        title: '기능 설정',
-        tags: [{ id: 1, label: '버그' }],
-        dueDate: '2024-07-01',
-        assigneeName: '최유현',
-      },
-    ],
-  },
-  {
-    id: 'done',
-    title: 'Done',
-    cards: [
-      {
-        id: 'card-6',
-        title: '기능 설정',
-        tags: [{ id: 1, label: '버그' }],
-        dueDate: '2024-07-01',
-        assigneeName: '최유현',
-      },
-    ],
-  },
-]
-
 export default function DashboardClient({
-  dashboardId: _dashboardId,
+  dashboardId,
   dashboardTitle,
+  members,
+  initialServerColumns,
 }: DashboardClientProps) {
-  const [columns, setColumns] = useState<ColumnData[]>(initialColumns)
+  const convertedColumns: ColumnData[] = initialServerColumns.map((col) => ({
+    id: String(col.id),
+    title: col.title,
+    cards: col.serverCards
+      ? col.serverCards.map((card) => ({
+          id: String(card.id),
+          title: card.title,
+          tags: card.tags,
+          dueDate: card.dueDate ?? undefined,
+          assigneeName: card.assignee?.nickname,
+          hasImage: !!card.imageUrl,
+        }))
+      : [],
+  }))
+
+  const [columns, setColumns] = useState<ColumnData[]>(convertedColumns)
   const [activeCardData, setActiveCardData] = useState<CardData | null>(null)
   const [selectedTask, setSelectedTask] = useState<CardData | null>(null)
-  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] =
-    useState<string>('')
+  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] = useState<string>('')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [activeColumnId, setActiveColumnId] = useState<number>(0)
+  const [activeColumnStringId, setActiveColumnStringId] = useState<string>('')
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // 5px 이상 움직여야 드래그로 간주
+        distance: 5,
       },
     }),
   )
 
-  // SSR Hydration 에러 방지용
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true)
   }, [])
 
   if (!isMounted) {
-    return null // 클라이언트 측 마운트 전에는 렌더링 무시
+    return null
   }
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -154,15 +107,33 @@ export default function DashboardClient({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
-    setActiveCardData(null) // 드래그 종료 시 오버레이 해제
+    setActiveCardData(null)
 
     if (!over) return
 
     const cardId = active.id as string
     const targetId = over.id as string
 
+    let targetColumnId: string | null = null
+    const isTargetColumn = columns.some((col) => col.id === targetId)
+    if (isTargetColumn) {
+      targetColumnId = targetId
+    } else {
+      for (const col of columns) {
+        if (col.cards.some((c) => c.id === targetId)) {
+          targetColumnId = col.id
+          break
+        }
+      }
+    }
+
+    if (targetColumnId) {
+      updateCard(Number(cardId), { columnId: Number(targetColumnId) }).catch(
+        (err) => console.error('카드 이동 실패:', err),
+      )
+    }
+
     setColumns((prevCols) => {
-      // 1. 기존 위치 파악하기 (위에서 아래로 드래그하는 경우인지 판별용)
       let sourceColOriginal = -1
       let sourceCardOriginal = -1
       let targetColOriginal = -1
@@ -189,7 +160,6 @@ export default function DashboardClient({
 
       let movedCard: CardData | null = null
 
-      // 2. 기존 컬럼에서 드래그된 카드를 찾고 제거함 (깊은 복사)
       const newCols = prevCols.map((col) => {
         const cardIndex = col.cards.findIndex((c) => c.id === cardId)
         if (cardIndex !== -1) {
@@ -204,21 +174,17 @@ export default function DashboardClient({
 
       if (!movedCard) return prevCols
 
-      // 3. 타겟 위치 찾기 및 끼워넣기
-      // 케이스 A: 컬럼 위(빈 공간)에 떨어뜨린 경우 -> 맨 아래에 추가
       const targetColIndex = newCols.findIndex((col) => col.id === targetId)
       if (targetColIndex !== -1) {
         newCols[targetColIndex].cards.push(movedCard)
         return newCols
       }
 
-      // 케이스 B: 특정 다른 "카드 위"에 떨어뜨린 경우
       for (let i = 0; i < newCols.length; i++) {
         const dropIndex = newCols[i].cards.findIndex((c) => c.id === targetId)
         if (dropIndex !== -1) {
-          // 위에서 아래로 당기는 거면 목표 카드의 '다음' 인덱스에 삽입해야 순서가 바뀜
           const insertIndex = dropIndex + (isTopToBottom ? 1 : 0)
-          newCols[i].cards.splice(insertIndex, 0, movedCard) // 끼워넣기
+          newCols[i].cards.splice(insertIndex, 0, movedCard)
           return newCols
         }
       }
@@ -231,18 +197,41 @@ export default function DashboardClient({
     setActiveCardData(null)
   }
 
-  const handleAddColumn = (title: string) => {
-    const newColumn = {
-      id: `col-${Date.now()}`,
-      title: title,
-      cards: [],
+  const handleAddColumn = async (title: string) => {
+    const result = await createColumn({ title, dashboardId })
+    if (result.success && result.data) {
+      const newColumn = {
+        id: String(result.data.id),
+        title: result.data.title,
+        cards: [],
+      }
+      setColumns((prev) => [...prev, newColumn])
+    } else {
+      alert(result.error || '컬럼 생성에 실패했습니다.')
     }
-    setColumns((prev) => [...prev, newColumn])
   }
 
   const handleTaskClick = (task: CardData, columnTitle: string) => {
     setSelectedTask(task)
     setSelectedTaskColumnTitle(columnTitle)
+  }
+
+  const handleCardCreated = (card: import('@/libs/types/Dashboard').Card) => {
+    const newCard: CardData = {
+      id: String(card.id),
+      title: card.title,
+      tags: card.tags,
+      dueDate: card.dueDate ?? undefined,
+      assigneeName: card.assignee?.nickname,
+      hasImage: !!card.imageUrl,
+    }
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === activeColumnStringId
+          ? { ...col, cards: [...col.cards, newCard] }
+          : col,
+      ),
+    )
   }
 
   return (
@@ -251,7 +240,6 @@ export default function DashboardClient({
         {dashboardTitle}
       </h1>
 
-      {/* 컬럼 가로 */}
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
@@ -264,7 +252,11 @@ export default function DashboardClient({
               key={column.id}
               id={column.id}
               title={column.title}
-              onAddCard={() => setIsCreateModalOpen(true)}
+              onAddCard={() => {
+                setActiveColumnId(Number(column.id))
+                setActiveColumnStringId(column.id)
+                setIsCreateModalOpen(true)
+              }}
             >
               {column.cards.map((card) => (
                 <Card
@@ -281,14 +273,12 @@ export default function DashboardClient({
             </Column>
           ))}
 
-          {/* TODO: 새로운 컬럼 추가 버튼 영역 */}
           <AddColumnButton
             onAddColumn={handleAddColumn}
             canAddMore={columns.length < 20}
           />
         </div>
 
-        {/* 최상위에서 그려지는 오버레이 (스크롤 이슈 방지) */}
         <DragOverlay>
           {activeCardData ? (
             <Card
@@ -304,18 +294,23 @@ export default function DashboardClient({
         </DragOverlay>
       </DndContext>
 
-      {/* 태스크 상세 모달 */}
       {selectedTask && (
         <TaskDetailModal
-          task={selectedTask}
+          cardId={Number(selectedTask.id)}
+          dashboardId={dashboardId}
           columnTitle={selectedTaskColumnTitle}
           onClose={() => setSelectedTask(null)}
         />
       )}
 
-      {/* 태크스 생성 모달 */}
       {isCreateModalOpen && (
-        <TaskCreateModal onClose={() => setIsCreateModalOpen(false)} />
+        <TaskCreateModal
+          onClose={() => setIsCreateModalOpen(false)}
+          dashboardId={dashboardId}
+          columnId={activeColumnId}
+          members={members}
+          onCardCreated={handleCardCreated}
+        />
       )}
     </div>
   )

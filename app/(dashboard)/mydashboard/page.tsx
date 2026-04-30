@@ -1,9 +1,9 @@
+export const dynamic = 'force-dynamic'
+
 import InvitationContainer from '@/components/mydashboard/InvitationContainer'
 import DashboardContainer from '@/components/mydashboard/DashboardContainer'
 import { getInvitations } from '@/libs/api/dashboard/getInvitations'
 import { getDashboards } from '@/libs/api/dashboard/getDashboard'
-
-export const dynamic = 'force-dynamic'
 
 export default async function MyDashboardPage() {
   const [dashboardData, inviteData] = await Promise.all([

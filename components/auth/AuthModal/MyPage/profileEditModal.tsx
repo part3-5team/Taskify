@@ -7,7 +7,7 @@ import Button from '@/components/common/button'
 import Input from '@/components/common/input'
 import PasswordChangeModal from './passwordChangeModal'
 import { updateMyInfo, uploadProfileImage } from '@/libs/api/user'
-import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 interface ProfileEditModalProps {
   isOpen: boolean
@@ -30,6 +30,7 @@ export default function ProfileEditModal({
   onUpdateUser,
   user,
 }: ProfileEditModalProps) {
+  const router = useRouter()
   const [nickname, setNickname] = useState(user.nickname)
   const [image, setImage] = useState<string | undefined>(user.imageUrl)
   const [previewImage, setPreviewImage] = useState<string | undefined>(
@@ -43,7 +44,6 @@ export default function ProfileEditModal({
 
   if (!isOpen) return null
 
-  const profileText = nickname.trim().slice(0, 1) || user.nickname.slice(0, 1)
   const displayImage = isImageDeleted ? undefined : previewImage || image
 
   const handleClickImageChange = () => {
@@ -139,7 +139,7 @@ export default function ProfileEditModal({
 
       onClose()
 
-      console.log('프로필 변경 완료', updatedUser)
+      router.refresh()
     } catch (error) {
       console.error('프로필 수정 실패', error)
     }
@@ -174,7 +174,7 @@ export default function ProfileEditModal({
 
             <div className="mb-6 flex items-center gap-4 md:mb-[30px] md:gap-5">
               {displayImage ? (
-                <Image
+                <img
                   src={displayImage}
                   alt="profile"
                   className="size-[110px] shrink-0 rounded-full object-cover md:size-[120px]"
