@@ -13,7 +13,7 @@ export default async function SideMenu() {
   const dashboards = result.success && result.data ? result.data.dashboards : []
 
   return (
-    <aside className="bg-black-500 flex h-full w-[300px] shrink-0 flex-col border-r border-gray-900 py-2">
+    <aside className="bg-black-500 sidebar absolute z-50 hidden h-full w-[300px] shrink-0 flex-col border-r border-gray-900 py-2 md:static md:flex">
       <SidebarHeader />
       <SidebarDashboardList dashboards={dashboards} />
       <div className="mt-auto">

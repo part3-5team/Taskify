@@ -1,12 +1,15 @@
 'use client'
 
-import { ElementType } from 'react'
+import { ElementType, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Setting from '@/assets/icons/ic_setting.svg'
 import UserPlus from '@/assets/icons/ic_user_plus.svg'
 import Logout from '@/assets/icons/ic_logout.svg'
 import InviteMemberModal from './edit/InviteMemberModal'
 import useDashboardHeader from '@/libs/hooks/useDashboardHeader'
+import DashboardHeaderMemberList from './DashboardHeaderMemberList'
+import { getDashboardDetail } from '@/libs/api/dashboard/getDeashboardDetail'
+import MobileSideMenuButton from '@/assets/icons/ic_sidemenu.svg'
 
 const BUTTON_STYLE =
   'hover:bg-modal active:bg-black-300 flex items-center gap-2 rounded-xs px-3 py-2.5 cursor-pointer text-gray-400 text-lg-16-medium transition-colors'
@@ -16,16 +19,18 @@ const HeaderActionButton = ({
   href,
   icon: Icon,
   label,
+  isLogout,
 }: {
   onClick?: () => void
   href?: string
   icon: ElementType
   label: string
+  isLogout?: boolean
 }) => {
   const content = (
     <>
       <Icon aria-label={`${label} 아이콘`} />
-      {label}
+      <span className={`${!isLogout && `hidden md:block`}`}>{label}</span>
     </>
   )
 
@@ -43,6 +48,23 @@ const HeaderActionButton = ({
   )
 }
 
+const DashboardMobileButton = () => {
+  const handleSideMenuClick = () => {
+    const sidebars = document.querySelectorAll('.sidebar')
+
+    sidebars.forEach((el) => {
+      el.classList.toggle('hidden')
+      el.classList.add('flex')
+    })
+  }
+
+  return (
+    <button onClick={handleSideMenuClick} className="text-gray-300 md:hidden">
+      <MobileSideMenuButton />
+    </button>
+  )
+}
+
 export default function Header() {
   const {
     isMyDashboard,
@@ -53,18 +75,51 @@ export default function Header() {
     handleLogout,
   } = useDashboardHeader()
 
+  const [isCreatedMyDashboard, setIsCreatedMyDashboard] = useState(false)
+
+  useEffect(() => {
+    let ignore = false
+
+    const sidebars = document.querySelectorAll('.sidebar')
+
+    sidebars.forEach((el) => {
+      el.classList.add('hidden')
+    })
+
+    const fetchDetail = async () => {
+      const res = await getDashboardDetail(Number(dashboardId))
+
+      if (ignore) return
+
+      if (res.data) {
+        setIsCreatedMyDashboard(res.data.createdByMe)
+      }
+    }
+
+    fetchDetail()
+
+    return () => {
+      ignore = true
+    }
+  }, [dashboardId])
+
   return (
-    <header className="bg-bg border-black-300 flex h-18 w-full items-center justify-end border-b-2 p-7.5">
+    <header className="bg-bg border-black-300 flex h-18 w-full items-center justify-between border-b-2 p-7.5 md:justify-end">
+      <DashboardMobileButton />
       <nav className="flex gap-4">
+        {!isMyDashboard && (
+          <DashboardHeaderMemberList dashboardId={Number(dashboardId)} />
+        )}
         {isMyDashboard && (
           <HeaderActionButton
             onClick={handleLogout}
             icon={Logout}
             label="로그아웃"
+            isLogout
           />
         )}
 
-        {!isMyDashboard && (
+        {!isMyDashboard && isCreatedMyDashboard && (
           <>
             <HeaderActionButton
               href={`/dashboard/${dashboardId}/edit`}
