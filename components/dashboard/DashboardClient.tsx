@@ -15,23 +15,16 @@ import Card from '@/components/dashboard/TaskCard'
 import AddColumnButton from '@/components/dashboard/AddColumnButton'
 import TaskDetailModal from '@/components/dashboard/TaskDetailModal'
 import TaskCreateModal from '@/components/dashboard/TaskCreateModal'
-import { createColumn } from '@/libs/api/column/createColumn'
-import { updateCard } from '@/libs/api/card/updateCard'
-import {
-  Member,
-  Column as ServerColumn,
-  Card as ServerCard,
-} from '@/libs/types/Dashboard'
-
-export interface ServerColumnWithCards extends ServerColumn {
-  serverCards: ServerCard[]
-}
+import { getCards } from '@/libs/api/cards/getCards'
+import type { CardDetail } from '@/libs/types/Card'
 
 interface DashboardClientProps {
   dashboardId: number
   dashboardTitle: string
-  members: Member[]
-  initialServerColumns: ServerColumnWithCards[]
+  columns: {
+    id: number
+    title: string
+  }[]
 }
 
 type TagData = {
@@ -40,7 +33,7 @@ type TagData = {
 }
 
 type CardData = {
-  id: string
+  id: number
   title: string
   tags?: TagData[]
   dueDate?: string
@@ -49,9 +42,11 @@ type CardData = {
 }
 
 type ColumnData = {
-  id: string
+  id: number
   title: string
   cards: CardData[]
+  cursorId: number | null
+  hasMore: boolean
 }
 
 export default function DashboardClient({
@@ -60,31 +55,15 @@ export default function DashboardClient({
   members,
   initialServerColumns,
 }: DashboardClientProps) {
-  // 서버에서 받아온 실제 컬럼 데이터를 클라이언트 구조(ColumnData)로 변환
-  const convertedColumns: ColumnData[] = initialServerColumns.map((col) => ({
-    id: String(col.id),
-    title: col.title,
-    cards: col.serverCards
-      ? col.serverCards.map((card) => ({
-          id: String(card.id),
-          title: card.title,
-          tags: card.tags.map((label, idx) => ({ id: idx, label })),
-          dueDate: card.dueDate ?? undefined,
-          assigneeName: card.assignee?.nickname,
-          hasImage: !!card.imageUrl,
-        }))
-      : [],
-  }))
-
-  const [columns, setColumns] = useState<ColumnData[]>(convertedColumns)
+  const [columns, setColumns] = useState<ColumnData[]>([])
   const [activeCardData, setActiveCardData] = useState<CardData | null>(null)
   const [selectedTask, setSelectedTask] = useState<CardData | null>(null)
-  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] =
-    useState<string>('')
+  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] = useState('')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  // 할일 생성 모달에 전달할 현재 컬럼 정보
-  const [activeColumnId, setActiveColumnId] = useState<number>(0)
-  const [activeColumnStringId, setActiveColumnStringId] = useState<string>('')
+  const [selectedColumnId, setSelectedColumnId] = useState<number | null>(null)
+
+  // SSR Hydration 에러 방지용
+  const [isMounted, setIsMounted] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -94,9 +73,6 @@ export default function DashboardClient({
     }),
   )
 
-  // SSR Hydration 에러 방지용
-  const [isMounted, setIsMounted] = useState(false)
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true)
@@ -104,6 +80,38 @@ export default function DashboardClient({
 
   if (!isMounted) {
     return null // 클라이언트 측 마운트 전에는 렌더링 무시
+  }
+
+  const convertCardDetailToCardData = (card: CardDetail): CardData => {
+    return {
+      id: card.id,
+      title: card.title,
+      tags: card.tags.map((tag, idx) => ({
+        id: idx + 1,
+        label: tag,
+      })),
+      dueDate: card.dueDate ?? undefined,
+      assigneeName: card.assignee?.nickname,
+      hasImage: Boolean(card.imageUrl),
+    }
+  }
+
+  const handleCreateCard = (newCard: CardDetail) => {
+    const convertedCard = convertCardDetailToCardData(newCard)
+
+    setColumns((prev) =>
+      prev.map((column) =>
+        column.id === newCard.columnId
+          ? {
+              ...column,
+              cards: [convertedCard, ...column.cards],
+            }
+          : column,
+      ),
+    )
+
+    setIsCreateModalOpen(false)
+    setSelectedColumnId(null)
   }
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -121,8 +129,8 @@ export default function DashboardClient({
 
     if (!over) return
 
-    const cardId = active.id as string
-    const targetId = over.id as string
+    const cardId = active.id as number
+    const targetId = over.id as number
 
     // API 호출을 위해 미리 타겟 컬럼 ID 계산
     let targetColumnId: string | null = null
@@ -153,11 +161,11 @@ export default function DashboardClient({
 
       prevCols.forEach((col, cIdx) => {
         const sIdx = col.cards.findIndex((c) => c.id === cardId)
+        const tIdx = col.cards.findIndex((c) => c.id === targetId)
         if (sIdx !== -1) {
           sourceColOriginal = cIdx
           sourceCardOriginal = sIdx
         }
-        const tIdx = col.cards.findIndex((c) => c.id === targetId)
         if (tIdx !== -1) {
           targetColOriginal = cIdx
           targetCardOriginal = tIdx
@@ -214,17 +222,11 @@ export default function DashboardClient({
     setActiveCardData(null)
   }
 
-  const handleAddColumn = async (title: string) => {
-    const result = await createColumn({ title, dashboardId })
-    if (result.success && result.data) {
-      const newColumn = {
-        id: String(result.data.id),
-        title: result.data.title,
-        cards: [],
-      }
-      setColumns((prev) => [...prev, newColumn])
-    } else {
-      alert(result.error || '컬럼 생성에 실패했습니다.')
+  const handleAddColumn = (title: string) => {
+    const newColumn: ColumnData = {
+      id: Date.now(),
+      title,
+      cards: [],
     }
   }
 
@@ -272,9 +274,7 @@ export default function DashboardClient({
               id={column.id}
               title={column.title}
               onAddCard={() => {
-                // 실제 컬럼의 ID를 모달에 전달
-                setActiveColumnId(Number(column.id))
-                setActiveColumnStringId(column.id)
+                setSelectedColumnId(column.id)
                 setIsCreateModalOpen(true)
               }}
             >
@@ -319,20 +319,23 @@ export default function DashboardClient({
       {/* 태스크 상세 모달 */}
       {selectedTask && (
         <TaskDetailModal
-          task={selectedTask}
+          cardId={selectedTask.id}
+          dashboardId={dashboardId}
           columnTitle={selectedTaskColumnTitle}
           onClose={() => setSelectedTask(null)}
         />
       )}
 
-      {/* 태스크 생성 모달 */}
-      {isCreateModalOpen && (
+      {/* 태크스 생성 모달 */}
+      {isCreateModalOpen && selectedColumnId !== null && (
         <TaskCreateModal
-          onClose={() => setIsCreateModalOpen(false)}
           dashboardId={dashboardId}
-          columnId={activeColumnId}
-          members={members}
-          onCardCreated={handleCardCreated}
+          columnId={selectedColumnId}
+          onClose={() => {
+            setIsCreateModalOpen(false)
+            setSelectedColumnId(null)
+          }}
+          onCreate={handleCreateCard}
         />
       )}
     </div>

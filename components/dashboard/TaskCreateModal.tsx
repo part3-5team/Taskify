@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useState, useRef, useTransition, useMemo } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -11,30 +12,12 @@ import Dropdown, { DropdownUser } from '@/components/common/dropdown/Dropdown'
 import Button from '@/components/common/button'
 import IconX from '@/assets/icons/ic_X.svg'
 import IconImage from '@/assets/icons/ic_image.svg'
-import { createCard } from '@/libs/api/card/createCard'
-import { uploadCardImage } from '@/libs/api/card/uploadCardImage'
-import { Member, Card } from '@/libs/types/Dashboard'
-
-// 태그 텍스트 기반으로 일관된 색상을 반환하는 함수 (TaskCard와 동일한 로직)
-function getTagColorClasses(label: string) {
-  if (label === '프로젝트') return 'bg-profile-blue text-white'
-  if (label === '일정') return 'bg-profile-yellow text-white'
-  if (label === '공부') return 'bg-profile-cyan text-white'
-  if (label === '버그') return 'bg-red-500 text-white'
-  
-  // 지정되지 않은 태그는 텍스트 길이나 첫 글자를 이용해 일정한 색상 배정
-  const colors = [
-    'bg-profile-rose text-white',
-    'bg-profile-orange text-white',
-    'bg-profile-violet text-white',
-    'bg-brand-500 text-white',
-    'bg-profile-green text-white'
-  ]
-  const index = label.length % colors.length
-  return colors[index]
-}
+import { createCard } from '@/libs/api/cards/createCard'
+import type { CardDetail } from '@/libs/types/Card'
 
 interface TaskCreateModalProps {
+  dashboardId: number
+  columnId: number
   onClose: () => void
   dashboardId: number
   columnId: number
@@ -147,20 +130,20 @@ export default function TaskCreateModal({
         columnId,
         title: title.trim(),
         description: description.trim(),
-        dueDate: dueDate ? formatDueDate(dueDate) : undefined,
+        dueDate: dueDate || undefined,
+        tags,
+        imageUrl: imageUrl || undefined,
         assigneeUserId,
-        tags: tags.length > 0 ? tags : undefined,
-        imageUrl,
       })
-      if (!result.success) {
-        setError(result.error ?? '할 일 생성에 실패했습니다.')
-        return
-      }
-      if (result.data) {
-        onCardCreated?.(result.data, columnId)
-      }
+
+      onCreate?.(newCard)
       onClose()
-    })
+    } catch (error) {
+      console.error(error)
+      alert('카드 생성에 실패했습니다.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -168,158 +151,114 @@ export default function TaskCreateModal({
       onClose={onClose}
       className="bg-modal w-full max-w-[500px] overflow-y-auto rounded-2xl p-7 text-left"
     >
-      {/* 헤더 */}
       <div className="mb-8 flex items-center justify-between">
         <h2 className="text-2xl-24-bold text-gray-100">할 일 생성</h2>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-100">
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-400 hover:text-gray-100"
+        >
           <IconX className="h-6 w-6" />
         </button>
       </div>
 
       <div className="space-y-6">
-        {/* 제목 */}
         <div>
           <label className="mb-2 block text-sm font-semibold text-gray-100">
             제목<span className="text-brand-500 ml-0.5">*</span>
           </label>
+
           <Input
-            placeholder="제목을 입력해주세요"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            placeholder="제목을 입력해주세요"
           />
         </div>
 
-        {/* 설명 */}
         <div>
           <label className="mb-2 block text-sm font-semibold text-gray-100">
             설명<span className="text-brand-500 ml-0.5">*</span>
           </label>
+
           <TextArea
-            placeholder="설명을 입력해주세요"
-            className="h-[120px]"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            placeholder="설명을 입력해주세요"
+            className="h-[120px]"
           />
         </div>
 
-        {/* 마감일 & 담당자 */}
         <div className="flex gap-4">
           {/* 마감일 - react-datepicker */}
           <div className="flex-1">
             <label className="mb-2 block text-sm font-semibold text-gray-100">
               마감일<span className="text-brand-500 ml-0.5">*</span>
             </label>
-            <DatePicker
-              selected={dueDate}
-              onChange={(date: Date | null) => setDueDate(date)}
-              showTimeSelect
-              timeFormat="HH:mm"
-              timeIntervals={30}
-              dateFormat="yyyy-MM-dd HH:mm"
-              placeholderText="날짜를 선택해 주세요"
-              locale={ko}
-              minDate={new Date()}
-              popperPlacement="bottom-start"
-              wrapperClassName="w-full"
-              className="bg-black-400 w-full rounded-[14px] border border-gray-700 px-5 py-3 text-white placeholder-gray-600 outline-none focus:border-blue-200"
+
+            <Input
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              placeholder="YYYY-MM-DD"
             />
           </div>
 
-          {/* 담당자 - 초대받은 멤버만 */}
           <div className="flex-1">
             <label className="mb-2 block text-sm font-semibold text-gray-100">
               담당자<span className="text-brand-500 ml-0.5">*</span>
             </label>
-            <Dropdown
-              users={dropdownUsers}
-              onSelect={(user) => setAssigneeUserId(user.id)}
-              placeholder="담당자 선택"
-            />
+
+            <Dropdown />
           </div>
         </div>
 
-        {/* 태그 */}
         <div>
           <label className="mb-2 block text-sm font-semibold text-gray-100">
             태그
           </label>
-          {/* 입력된 태그 목록 */}
-          {tags.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-2">
-              {tags.map((tag) => {
-                const colorClasses = getTagColorClasses(tag)
-                return (
-                  <span
-                    key={tag}
-                    className={`flex items-center gap-1 text-xs-12-medium rounded px-2 py-0.5 ${colorClasses}`}
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTag(tag)}
-                      className="ml-0.5 opacity-60 hover:opacity-100"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )
-              })}
-            </div>
-          )}
+
           <Input
-            placeholder="입력 후 Enter"
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleTagKeyDown}
+            onKeyDown={handleAddTag}
+            placeholder="입력 후 Enter"
           />
+
+          {tags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleRemoveTag(tag)}
+                  className="bg-brand-500 rounded px-2 py-1 text-xs text-white"
+                >
+                  {tag} ×
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* 이미지 (최대 1개) */}
         <div>
           <label className="mb-2 block text-sm font-semibold text-gray-100">
-            이미지
+            이미지 URL
           </label>
-          <div
-            className="relative flex h-[140px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-gray-700 bg-gray-900 transition-colors hover:bg-gray-800"
-            onClick={() => !imageFile && fileInputRef.current?.click()}
-          >
-            {imagePreview ? (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imagePreview}
-                  alt="미리보기"
-                  className="h-full w-full object-cover"
-                />
-                {/* 이미지 삭제 버튼 */}
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
-                >
-                  ×
-                </button>
-              </>
-            ) : (
-              <>
-                <IconImage className="mb-2 h-8 w-8 text-gray-500" />
-                <span className="text-sm text-gray-500">+ image upload</span>
-              </>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-            />
+
+          <Input
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="이미지 URL을 입력해주세요"
+          />
+
+          <div className="relative mt-3 flex h-[140px] w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-700 bg-gray-900">
+            <IconImage className="mb-2 h-8 w-8 text-gray-500" />
+            <span className="text-sm text-gray-500">
+              {imageUrl ? '이미지 URL 입력됨' : '+ image upload'}
+            </span>
           </div>
         </div>
 
-        {/* 에러 메시지 */}
-        {error && <p className="text-sm text-red-500">{error}</p>}
-
-        {/* 푸터 버튼 */}
         <div className="mt-8 flex gap-3">
           <Button
             variant="cancel"
@@ -329,11 +268,12 @@ export default function TaskCreateModal({
           >
             취소
           </Button>
+
           <Button
             variant="primary"
             className="flex-1"
             onClick={handleSubmit}
-            disabled={!isFormValid || isPending}
+            disabled={!isValid || isSubmitting}
           >
             생성
           </Button>
