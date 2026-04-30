@@ -6,7 +6,7 @@ import IconLeftArrow from '@/assets/icons/ic_chevron_left.svg'
 import IconRightArrow from '@/assets/icons/ic_chevorn_right.svg'
 import { useEffect, useState } from 'react'
 import DashboardCard from '@/components/mydashboard/DashboardCard'
-import CreateModalTrigger from '../dashboard/CreateModalTrigger'
+import CreateModalTrigger from '@/components/dashboard/CreateModalTrigger'
 
 type DashboardListProps = {
   dashboards: Dashboard[]
