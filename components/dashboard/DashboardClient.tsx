@@ -236,7 +236,7 @@ export default function DashboardClient({
   }
 
   return (
-    <div className="bg-bg flex min-h-screen w-full flex-col text-gray-100">
+    <div className="bg-bg flex min-h-full w-full flex-col text-gray-100">
       <h1 className="text-3xl-32-bold px-12 pt-6 pb-1 leading-19">
         {dashboardTitle}
       </h1>
