@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers'
 import { ApiResult } from '@/libs/types/Api'
 import { Dashboard } from '@/libs/types/Dashboard'
+import { revalidatePath } from 'next/cache'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
@@ -33,6 +34,8 @@ export const createDashboard = async (
         error: result.message || '대시보드 생성에 실패했습니다.',
       }
     }
+
+    revalidatePath('/dashboard')
 
     return {
       success: true,
