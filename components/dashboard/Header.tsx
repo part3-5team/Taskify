@@ -126,7 +126,7 @@ export default function Header() {
             <HeaderActionButton
               href={`/dashboard/${dashboardId}/edit`}
               icon={Setting}
-              label="설정"
+              label="관리"
             />
             <HeaderActionButton
               onClick={() => setInviteModalOpen(true)}
