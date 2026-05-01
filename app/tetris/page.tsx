@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 import { useTetris } from '@/libs/hooks/useTetris'
+import Link from 'next/link'
 
 // --- 타입 정의 ---
 interface ControlConfig {
@@ -113,9 +114,8 @@ export default function Tetris() {
 
   return (
     <div className="bg-modal flex min-h-screen flex-col items-center justify-center p-6 text-white shadow-xl">
-      <div className="text-brand-400 mb-4 text-3xl font-extrabold tracking-widest">
-        SCORE: {score}
-      </div>
+      <ReturnButton />
+      <Score score={score} />
 
       <div className="relative border-8 border-slate-700 bg-slate-950 p-1 shadow-inner">
         {displayGrid.map((row, y) => (
@@ -149,6 +149,21 @@ export default function Tetris() {
 }
 
 // --- 하위 컴포넌트 ---
+
+const ReturnButton = () => (
+  <Link
+    href="/mydashboard"
+    className="absolute top-12 right-12 flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-sm font-medium text-slate-300 transition-all hover:bg-slate-800 hover:text-white"
+  >
+    돌아가기
+  </Link>
+)
+
+const Score = ({ score }: { score: number }) => (
+  <div className="text-brand-400 mb-4 text-3xl font-extrabold tracking-widest">
+    SCORE: {score}
+  </div>
+)
 
 const GameoverUI = () => (
   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/85 backdrop-blur-sm">
