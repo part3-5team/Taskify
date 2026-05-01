@@ -271,6 +271,7 @@ export default function DashboardClient({
       </h1>
 
       <DndContext
+        id="dashboard-dnd-context"
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}

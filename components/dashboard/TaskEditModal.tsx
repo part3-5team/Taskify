@@ -81,6 +81,7 @@ export default function TaskEditModal({
       })
 
       onEdited(updatedCard)
+      window.location.reload()
     } catch (err) {
       console.error(err)
       alert('카드 수정에 실패했습니다')
