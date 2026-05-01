@@ -7,7 +7,6 @@ import Button from '@/components/common/button'
 import Input from '@/components/common/input'
 import PasswordChangeModal from './passwordChangeModal'
 import { updateMyInfo, uploadProfileImage } from '@/libs/api/user'
-import { useRouter } from 'next/navigation'
 
 interface ProfileEditModalProps {
   isOpen: boolean
@@ -30,7 +29,6 @@ export default function ProfileEditModal({
   onUpdateUser,
   user,
 }: ProfileEditModalProps) {
-  const router = useRouter()
   const [nickname, setNickname] = useState(user.nickname)
   const [image, setImage] = useState<string | undefined>(user.imageUrl)
   const [previewImage, setPreviewImage] = useState<string | undefined>(
@@ -139,7 +137,7 @@ export default function ProfileEditModal({
 
       onClose()
 
-      router.refresh()
+      window.location.reload()
     } catch (error) {
       console.error('프로필 수정 실패', error)
     }

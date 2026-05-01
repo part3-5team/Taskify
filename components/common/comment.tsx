@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import TextArea from './textArea'
 import Button from './button'
+import DefaultProfileImg from '@/assets/imgs/img_default_profile.svg'
 
 interface CommentProps {
   profileName?: string
+  profileImageUrl?: string | null
   disabled?: boolean
   defaultValue?: string
   onSubmit?: (value: string) => void
@@ -25,6 +27,7 @@ const expandedWrapperStyle =
 
 export default function Comment({
   profileName = 'name',
+  profileImageUrl,
   disabled = false,
   defaultValue = '',
   onSubmit,
@@ -57,7 +60,16 @@ export default function Comment({
 
   return (
     <div className={wrapperStyle}>
-      {!isExpanded && <div className={profileStyle}>{profileName}</div>}
+      {!isExpanded &&
+        (profileImageUrl ? (
+          <img
+            src={profileImageUrl}
+            alt="댓글 작성자 프로필"
+            className="h-8 w-8 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <DefaultProfileImg className="h-8 w-8 shrink-0 rounded-full bg-white object-cover" />
+        ))}
 
       <div className="w-full">
         {!isExpanded ? (

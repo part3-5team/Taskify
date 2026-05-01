@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import ModalLayout from '@/components/common/modal/ModalLayout'
 import IconMore from '@/assets/icons/ic_more.svg'
 import IconX from '@/assets/icons/ic_X.svg'
+import DefaultProfileImg from '@/assets/imgs/img_default_profile.svg'
 import PopdoverMenu from '@/components/common/PopdoverMenu'
 import CommentInput from '@/components/common/comment'
 import TaskEditModal from './TaskEditModal'
@@ -16,22 +17,45 @@ import {
   deleteComment,
 } from '@/libs/api/comment'
 import type { CommentData } from '@/libs/types/Comment'
+import { getMyInfo } from '@/libs/api/user'
+import type { Member } from '@/libs/types/Dashboard'
+
+type EditColumn = {
+  id: string
+  title: string
+}
+
+type MyInfo = {
+  id: number
+  email: string
+  nickname: string
+  profileImageUrl?: string | null
+  createdAt: string
+  updatedAt: string
+}
 
 interface TaskDetailModalProps {
   cardId: number
   dashboardId: number
   columnTitle: string
+  columns: EditColumn[]
+  members: Member[]
   onClose: () => void
+  onRequestDelete?: (cardId: number) => void
 }
 
 export default function TaskDetailModal({
   cardId,
   columnTitle,
-  onClose,
   dashboardId,
+  columns,
+  members,
+  onClose,
+  onRequestDelete,
 }: TaskDetailModalProps) {
   const [card, setCard] = useState<CardDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [myInfo, setMyInfo] = useState<MyInfo | null>(null)
   const [comments, setComments] = useState<CommentData[]>([])
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
   const [editingContent, setEditingContent] = useState('')
@@ -44,6 +68,19 @@ export default function TaskDetailModal({
 
   const [showMenu, setShowMenu] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+
+  useEffect(() => {
+    const fetchMyInfo = async () => {
+      try {
+        const data = await getMyInfo()
+        setMyInfo(data)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    fetchMyInfo()
+  }, [])
 
   useEffect(() => {
     const fetchCardDetail = async () => {
@@ -234,7 +271,11 @@ export default function TaskDetailModal({
                         setShowMenu(false)
                         setIsEditModalOpen(true)
                       }}
-                      onDeleteClick={() => setShowMenu(false)}
+                      onDeleteClick={() => {
+                        setShowMenu(false)
+                        onRequestDelete?.(cardId)
+                        onClose()
+                      }}
                     />
                   </div>
                 )}
@@ -294,9 +335,7 @@ export default function TaskDetailModal({
                       className="h-6 w-6 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="bg-profile-green flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white">
-                      {card.assignee.nickname.charAt(0)}
-                    </div>
+                    <DefaultProfileImg className="h-6 w-6 rounded-full bg-white object-cover" />
                   )}
 
                   <span className="text-xs-12-medium text-gray-200">
@@ -331,10 +370,14 @@ export default function TaskDetailModal({
           </div>
 
           <div className="mb-6">
-            <CommentInput profileName="정" onSubmit={handleCreateComment} />
+            <CommentInput
+              profileName={myInfo?.nickname}
+              profileImageUrl={myInfo?.profileImageUrl}
+              onSubmit={handleCreateComment}
+            />
           </div>
 
-          <div className="space-y-4">
+          <div className="max-h-[200px] space-y-4 overflow-y-auto pr-2">
             {comments.map((comment, idx) => {
               const isEditing = editingCommentId === comment.id
               const isLastComment = idx === comments.length - 1
@@ -352,9 +395,7 @@ export default function TaskDetailModal({
                       className="h-6 w-6 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
-                      {comment.author.nickname.charAt(0)}
-                    </div>
+                    <DefaultProfileImg className="h-6 w-6 rounded-full bg-white object-cover" />
                   )}
 
                   <div className="flex-1">
@@ -455,7 +496,11 @@ export default function TaskDetailModal({
                       setShowMenu(false)
                       setIsEditModalOpen(true)
                     }}
-                    onDeleteClick={() => setShowMenu(false)}
+                    onDeleteClick={() => {
+                      setShowMenu(false)
+                      onRequestDelete?.(cardId)
+                      onClose()
+                    }}
                   />
                 </div>
               )}
@@ -484,9 +529,7 @@ export default function TaskDetailModal({
                     className="h-6 w-6 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="bg-profile-green flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white">
-                    {card.assignee.nickname.charAt(0)}
-                  </div>
+                  <DefaultProfileImg className="h-6 w-6 rounded-full bg-white object-cover" />
                 )}
 
                 <span className="text-xs-12-medium text-gray-200">
@@ -521,8 +564,18 @@ export default function TaskDetailModal({
         </div>
       </ModalLayout>
 
-      {isEditModalOpen && (
-        <TaskEditModal onClose={() => setIsEditModalOpen(false)} />
+      {isEditModalOpen && card && (
+        <TaskEditModal
+          card={card}
+          dashboardId={dashboardId}
+          columns={columns}
+          members={members}
+          onClose={() => setIsEditModalOpen(false)}
+          onEdited={(updateCard) => {
+            setCard(updateCard)
+            setIsEditModalOpen(false)
+          }}
+        />
       )}
     </>
   )

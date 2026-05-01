@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   DndContext,
   DragEndEvent,
@@ -22,6 +22,8 @@ import {
   Column as ServerColumn,
   Card as ServerCard,
 } from '@/libs/types/Dashboard'
+import { deleteCard } from '@/libs/api/cards/deleteCard'
+import DeleteConfirmModal from './deleteConfirmModal'
 
 export interface ServerColumnWithCards extends ServerColumn {
   serverCards: ServerCard[]
@@ -40,6 +42,8 @@ type CardData = {
   tags?: string[]
   dueDate?: string
   assigneeName?: string
+  assigneeProfileImageUrl?: string | null
+  imageUrl?: string | null
   hasImage?: boolean
 }
 
@@ -55,28 +59,36 @@ export default function DashboardClient({
   members,
   initialServerColumns,
 }: DashboardClientProps) {
-  const convertedColumns: ColumnData[] = initialServerColumns.map((col) => ({
-    id: String(col.id),
-    title: col.title,
-    cards: col.serverCards
-      ? col.serverCards.map((card) => ({
-          id: String(card.id),
-          title: card.title,
-          tags: card.tags,
-          dueDate: card.dueDate ?? undefined,
-          assigneeName: card.assignee?.nickname,
-          hasImage: !!card.imageUrl,
-        }))
-      : [],
-  }))
+  const convertedColumns: ColumnData[] = useMemo(() => {
+    return initialServerColumns.map((col) => ({
+      id: String(col.id),
+      title: col.title,
+      cards: col.serverCards
+        ? col.serverCards.map((card) => ({
+            id: String(card.id),
+            title: card.title,
+            tags: card.tags,
+            dueDate: card.dueDate ?? undefined,
+            assigneeName: card.assignee?.nickname,
+            assigneeProfileImageUrl: card.assignee?.profileImageUrl,
+            imageUrl: card.imageUrl,
+            hasImage: !!card.imageUrl,
+          }))
+        : [],
+    }))
+  }, [initialServerColumns])
 
   const [columns, setColumns] = useState<ColumnData[]>(convertedColumns)
   const [activeCardData, setActiveCardData] = useState<CardData | null>(null)
   const [selectedTask, setSelectedTask] = useState<CardData | null>(null)
-  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] = useState<string>('')
+  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] =
+    useState<string>('')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [activeColumnId, setActiveColumnId] = useState<number>(0)
   const [activeColumnStringId, setActiveColumnStringId] = useState<string>('')
+  const [deleteTargetCardId, setDeleteTargetCardId] = useState<number | null>(
+    null,
+  )
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -85,16 +97,6 @@ export default function DashboardClient({
       },
     }),
   )
-
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  if (!isMounted) {
-    return null
-  }
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event
@@ -223,6 +225,8 @@ export default function DashboardClient({
       tags: card.tags,
       dueDate: card.dueDate ?? undefined,
       assigneeName: card.assignee?.nickname,
+      assigneeProfileImageUrl: card.assignee?.profileImageUrl,
+      imageUrl: card.imageUrl,
       hasImage: !!card.imageUrl,
     }
     setColumns((prev) =>
@@ -232,6 +236,32 @@ export default function DashboardClient({
           : col,
       ),
     )
+  }
+
+  const handleRequestDeleteCard = (cardId: number) => {
+    setDeleteTargetCardId(cardId)
+  }
+
+  const handleDeleteCard = async () => {
+    if (!deleteTargetCardId) return
+
+    try {
+      await deleteCard(deleteTargetCardId)
+
+      setColumns((prev) =>
+        prev.map((col) => ({
+          ...col,
+          cards: col.cards.filter(
+            (card) => card.id !== String(deleteTargetCardId),
+          ),
+        })),
+      )
+
+      setDeleteTargetCardId(null)
+    } catch (err) {
+      console.error(err)
+      alert('카드 삭제에 실패했습니다')
+    }
   }
 
   return (
@@ -266,6 +296,8 @@ export default function DashboardClient({
                   tags={card.tags}
                   dueDate={card.dueDate}
                   assigneeName={card.assigneeName}
+                  assigneeProfileImageUrl={card.assigneeProfileImageUrl}
+                  imageUrl={card.imageUrl}
                   hasImage={card.hasImage}
                   onClick={() => handleTaskClick(card, column.title)}
                 />
@@ -287,6 +319,8 @@ export default function DashboardClient({
               tags={activeCardData.tags}
               dueDate={activeCardData.dueDate}
               assigneeName={activeCardData.assigneeName}
+              assigneeProfileImageUrl={activeCardData.assigneeProfileImageUrl}
+              imageUrl={activeCardData.imageUrl}
               hasImage={activeCardData.hasImage}
               isOverlay={true}
             />
@@ -299,7 +333,10 @@ export default function DashboardClient({
           cardId={Number(selectedTask.id)}
           dashboardId={dashboardId}
           columnTitle={selectedTaskColumnTitle}
+          columns={columns}
+          members={members}
           onClose={() => setSelectedTask(null)}
+          onRequestDelete={handleRequestDeleteCard}
         />
       )}
 
@@ -312,6 +349,13 @@ export default function DashboardClient({
           onCardCreated={handleCardCreated}
         />
       )}
+
+      <DeleteConfirmModal
+        isOpen={deleteTargetCardId !== null}
+        variant="card"
+        onCancel={() => setDeleteTargetCardId(null)}
+        onDelete={handleDeleteCard}
+      />
     </div>
   )
 }
