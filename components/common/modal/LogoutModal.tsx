@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import ModalLayout from './ModalLayout'
 
 interface LogoutModalProps {
@@ -9,7 +10,15 @@ const BUTTON_STYLE =
   'text-2lg-18-semibold w-full rounded-2xl py-2 cursor-pointer'
 
 const Title = () => (
-  <h2 className="text-2xl-24-semibold text-gray-200">로그아웃 하시겠습니까?</h2>
+  <h2 className="text-2xl-24-semibold text-gray-200">
+    로그아웃 하시겠습니까?
+    <br />
+    <Link href="/tetris">
+      <span className="text-md-14-medium text-gray-400 hover:text-gray-100">
+        테트리스 하러 가기
+      </span>
+    </Link>
+  </h2>
 )
 
 const Buttons = ({ onClose, onLogout }: LogoutModalProps) => (

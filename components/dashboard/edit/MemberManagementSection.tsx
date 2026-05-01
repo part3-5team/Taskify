@@ -85,7 +85,7 @@ export default function MemberManagementSection({
                     className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-white`}
                   >
                     {member.profileImageUrl ? (
-                      <Image
+                      <img
                         src={member.profileImageUrl}
                         alt="profile"
                         className="h-full w-full object-cover"
