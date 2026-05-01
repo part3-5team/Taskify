@@ -73,7 +73,8 @@ export default function DashboardClient({
   const [columns, setColumns] = useState<ColumnData[]>(convertedColumns)
   const [activeCardData, setActiveCardData] = useState<CardData | null>(null)
   const [selectedTask, setSelectedTask] = useState<CardData | null>(null)
-  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] = useState<string>('')
+  const [selectedTaskColumnTitle, setSelectedTaskColumnTitle] =
+    useState<string>('')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [activeColumnId, setActiveColumnId] = useState<number>(0)
   const [activeColumnStringId, setActiveColumnStringId] = useState<string>('')
@@ -93,7 +94,7 @@ export default function DashboardClient({
   }, [])
 
   if (!isMounted) {
-    return null
+    return <div className="bg-bg min-h-screen"></div>
   }
 
   const handleDragStart = (event: DragStartEvent) => {
