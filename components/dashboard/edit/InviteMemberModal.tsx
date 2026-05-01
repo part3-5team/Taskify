@@ -36,6 +36,8 @@ export default function InviteMemberModal({
     }
   }
 
+  const isValidEmail = email.trim() !== '' && email.includes('@')
+
   return (
     <div className="fixed inset-0 z-99 flex items-center justify-center bg-black/40 px-5 md:px-0">
       <div className="border-stroke bg-modal z-999 w-full max-w-lg rounded-2xl border p-[30px] shadow-2xl">
@@ -75,6 +77,7 @@ export default function InviteMemberModal({
           <Button
             onClick={handleSubmit}
             size="sm"
+            disabled={!isValidEmail}
             className="h-[50px] w-[141px] md:h-[60px] md:w-full"
           >
             공유

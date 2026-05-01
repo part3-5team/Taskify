@@ -2,7 +2,7 @@
 
 import Button from '../common/button'
 
-type DeleteVariant = 'column' | 'dashboard'
+type DeleteVariant = 'column' | 'dashboard' | 'card'
 
 interface DeleteConfirmModalProps {
   isOpen: boolean
@@ -22,6 +22,10 @@ const DELETE_CONTENT: Record<
   dashboard: {
     title: '대시보드를 삭제하시겠습니까?',
     description: '모든 칼럼과 모든 카드도 함께 삭제됩니다',
+  },
+  card: {
+    title: '카드를 삭제하시겠습니까?',
+    description: '해당 카드의 모든 댓글도 함께 삭제됩니다',
   },
 }
 

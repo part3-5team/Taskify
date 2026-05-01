@@ -54,21 +54,52 @@ export default function TaskCard({
 
   const shouldShowImage = Boolean(imageUrl) || hasImage
 
+  const getDay = (dueDate?: string): string | null => {
+    if (!dueDate) return null
+
+    const today = new Date()
+    const due = new Date(dueDate)
+
+    today.setHours(0, 0, 0, 0)
+    due.setHours(0, 0, 0, 0)
+
+    const diff = Math.ceil(
+      (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    )
+
+    if (diff < 0) return null
+    if (diff > 3) return null
+
+    return diff === 0 ? 'D-Day' : `D-${diff}`
+  }
+
+  const dDay = getDay(dueDate)
+  const isUrgent = dDay === 'D-1'
+
   return (
     <div
       ref={isOverlay ? undefined : setNodeRef}
       {...(isOverlay ? {} : listeners)}
       {...(isOverlay ? {} : attributes)}
       onClick={isOverlay ? undefined : onClick}
-      className={`border-black-200 cursor-grab rounded-xl border p-4 transition-all ${
+      className={`border-black-200 relative cursor-grab rounded-xl border p-4 transition-all ${
+        isUrgent ? 'border-red-400' : 'border-none'
+      } ${
         isDragging && !isOverlay
           ? 'opacity-30'
           : 'bg-black-300 hover:bg-black-200'
       } ${isOverlay ? 'cursor-grabbing shadow-xl' : ''}`}
     >
+      {/* 디데이 뱃지 */}
+      {typeof dDay === 'string' && dDay.length > 0 && (
+        <span className="text-xs-12-semibold absolute top-3 right-3 rounded-2xl bg-red-400 px-2 py-0.5 text-white">
+          {dDay}
+        </span>
+      )}
+
       {/* 1. 이미지 (썸네일) 영역 - 일단 회색 박스로 대체 */}
       {shouldShowImage && (
-        <div className="bg-black-200 mb-3 h-[160px] w-full rounded-lg">
+        <div className="mb-3 h-[160px] w-full rounded-lg">
           {imageUrl && (
             <img
               src={imageUrl}
@@ -88,14 +119,11 @@ export default function TaskCard({
           {tags.map((tag, idx) => {
             let colorClasses = 'bg-brand-500 text-white'
 
-            if (tag === '프로젝트')
-              colorClasses = 'bg-profile-blue text-white'
+            if (tag === '프로젝트') colorClasses = 'bg-profile-blue text-white'
             else if (tag === '일정')
               colorClasses = 'bg-profile-yellow text-white'
-            else if (tag === '공부')
-              colorClasses = 'bg-profile-cyan text-white'
-            else if (tag === '버그')
-              colorClasses = 'bg-red-500 text-white'
+            else if (tag === '공부') colorClasses = 'bg-profile-cyan text-white'
+            else if (tag === '버그') colorClasses = 'bg-red-500 text-white'
 
             return (
               <span
