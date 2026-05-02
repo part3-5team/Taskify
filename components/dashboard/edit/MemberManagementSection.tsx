@@ -88,7 +88,7 @@ export default function MemberManagementSection({
                       <img
                         src={member.profileImageUrl}
                         alt="profile"
-                        className="h-full w-full object-cover"
+                        className="h-full w-full rounded-full object-cover"
                       />
                     ) : (
                       <ProfileImg className="h-full w-full rounded-full" />

@@ -20,7 +20,7 @@ const profileStyle =
   'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-600 text-[10px] font-medium text-white'
 
 const collapsedInputStyle =
-  'w-full h-[40px] rounded-full border border-gray-700 bg-black-400 px-4 text-white outline-none placeholder:text-gray-400 focus:border-blue-200 disabled:bg-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed'
+  'w-full h-[40px] rounded-full text-lg-16-medium border border-gray-700 bg-black-400 px-4 text-white outline-none placeholder:text-gray-400 focus:border-blue-200 disabled:bg-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed'
 
 const expandedWrapperStyle =
   'w-full rounded-[14px] border border-blue-200 bg-black-400 px-4 pt-4 pb-3'

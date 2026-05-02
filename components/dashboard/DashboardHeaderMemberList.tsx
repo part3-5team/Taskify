@@ -38,15 +38,15 @@ export default function DashboardHeaderMemberList({
       {members.map((member) => (
         <div
           key={member.id}
-          className="relative -ml-4 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white"
+          className="relative -ml-4 flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-white md:h-8 md:w-8"
         >
           {member.profileImageUrl ? (
             <Image
               src={member.profileImageUrl}
               alt={`${member.nickname ?? 'member'} profile`}
               fill
-              sizes="32px"
-              className="object-cover"
+              sizes="24px"
+              className="size-6 object-cover md:size-8"
               unoptimized
             />
           ) : (
