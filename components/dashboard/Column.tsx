@@ -10,6 +10,7 @@ interface ColumnProps {
   id: string
   title: string
   children?: React.ReactNode
+  cardCount: number
   onAddCard?: () => void
   onEditClick?: () => void
   onDeleteClick?: () => void
@@ -19,6 +20,7 @@ export default function Column({
   id,
   title,
   children,
+  cardCount,
   onAddCard,
   onEditClick,
   onDeleteClick,
@@ -47,8 +49,7 @@ export default function Column({
         <div className="flex items-center gap-2">
           {/* TODO: 제목 왼쪽 동그란 점 */}
           <h2 className="text-lg-16-semibold text-gray-100">{title}</h2>
-          {/* 카드 개수 뱃지 */}
-          <h2 className="text-lg-16-bold text-gray-400">2</h2>
+          <h2 className="text-lg-16-bold text-gray-400">{cardCount}</h2>
         </div>
 
         {/* 플러스 및 설정 아이콘 */}

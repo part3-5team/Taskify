@@ -320,6 +320,7 @@ export default function DashboardClient({
               key={column.id}
               id={column.id}
               title={column.title}
+              cardCount={column.cards.length}
               onAddCard={() => {
                 setActiveColumnId(Number(column.id))
                 setActiveColumnStringId(column.id)
