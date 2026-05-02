@@ -93,13 +93,21 @@ export default function TaskEditModal({
     }
   }
 
-  const getTagColor = (tag: string) => {
-    if (tag === '할 일') return 'bg-profile-orange text-white'
-    if (tag === '프로젝트') return 'bg-profile-blue text-white'
-    if (tag === '디자인') return 'bg-profile-violet text-white'
-    if (tag === '버그') return 'bg-profile-rose text-white'
+  function getTagColorClasses(label: string) {
+    if (label === '프로젝트') return 'bg-profile-blue text-white'
+    if (label === '일정') return 'bg-profile-yellow text-white'
+    if (label === '공부') return 'bg-profile-cyan text-white'
+    if (label === '버그') return 'bg-red-500 text-white'
 
-    return 'bg-brand-500 text-white'
+    const colors = [
+      'bg-profile-rose text-white',
+      'bg-profile-orange text-white',
+      'bg-profile-violet text-white',
+      'bg-brand-500 text-white',
+      'bg-profile-green text-white',
+    ]
+    const index = label.length % colors.length
+    return colors[index]
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +141,7 @@ export default function TaskEditModal({
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 space-y-6 overflow-y-auto">
+      <div className="scrollbar-thin min-h-0 flex-1 space-y-6 overflow-y-auto py-4 pr-2">
         {/* 제목 */}
         <div>
           <label className="mb-2 block text-sm font-semibold text-gray-100">
@@ -214,27 +222,35 @@ export default function TaskEditModal({
           <label className="mb-2 block text-sm font-semibold text-gray-100">
             태그
           </label>
-
-          <div className="relative flex min-h-[48px] flex-wrap items-center gap-2 rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 focus-within:border-blue-100">
-            <div className="flex flex-wrap gap-1.5">
-              {tags.map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className={`text-xs-12-medium rounded px-2 py-0.5 ${getTagColor(tag)}`}
-                >
-                  {tag} x
-                </button>
-              ))}
+          {tags.length > 0 && (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {tags.map((tag) => {
+                const colorClasses = getTagColorClasses(tag)
+                return (
+                  <span
+                    key={tag}
+                    className={`text-xs-12-medium flex items-center gap-1 rounded px-2 py-0.5 ${colorClasses}`}
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tag)}
+                      className="ml-0.5 opacity-60 hover:opacity-100"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )
+              })}
             </div>
-            <Input
-              placeholder="입력 후 Enter"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={handleTagKeyDown}
-            />
-          </div>
+          )}
+
+          <Input
+            placeholder="입력 후 Enter"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleTagKeyDown}
+          />
         </div>
 
         {/* 이미지 */}
@@ -250,7 +266,7 @@ export default function TaskEditModal({
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={imagePreview}
+                  src={previewSrc}
                   alt="미리보기"
                   className="h-full w-full object-cover"
                 />
