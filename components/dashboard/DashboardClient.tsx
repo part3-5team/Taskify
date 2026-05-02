@@ -314,12 +314,13 @@ export default function DashboardClient({
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <div className="flex flex-1 gap-5 overflow-x-auto px-12 pb-10">
+        <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 pb-10 md:px-8 lg:flex-row lg:overflow-x-auto lg:px-12">
           {columns.map((column) => (
             <Column
               key={column.id}
               id={column.id}
               title={column.title}
+              cardCount={column.cards.length}
               onAddCard={() => {
                 setActiveColumnId(Number(column.id))
                 setActiveColumnStringId(column.id)
