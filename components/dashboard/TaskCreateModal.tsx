@@ -20,13 +20,13 @@ function getTagColorClasses(label: string) {
   if (label === '일정') return 'bg-profile-yellow text-white'
   if (label === '공부') return 'bg-profile-cyan text-white'
   if (label === '버그') return 'bg-red-500 text-white'
-  
+
   const colors = [
     'bg-profile-rose text-white',
     'bg-profile-orange text-white',
     'bg-profile-violet text-white',
     'bg-brand-500 text-white',
-    'bg-profile-green text-white'
+    'bg-profile-green text-white',
   ]
   const index = label.length % colors.length
   return colors[index]
@@ -158,7 +158,11 @@ export default function TaskCreateModal({
     >
       <div className="mb-8 flex items-center justify-between">
         <h2 className="text-2xl-24-bold text-gray-100">할 일 생성</h2>
-        <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-100">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-400 hover:text-gray-100"
+        >
           <IconX className="h-6 w-6" />
         </button>
       </div>
@@ -216,6 +220,7 @@ export default function TaskCreateModal({
               users={dropdownUsers}
               onSelect={(user) => setAssigneeUserId(user.id)}
               placeholder="담당자 선택"
+              showProfileImage={true}
             />
           </div>
         </div>
@@ -231,7 +236,7 @@ export default function TaskCreateModal({
                 return (
                   <span
                     key={tag}
-                    className={`flex items-center gap-1 text-xs-12-medium rounded px-2 py-0.5 ${colorClasses}`}
+                    className={`text-xs-12-medium flex items-center gap-1 rounded px-2 py-0.5 ${colorClasses}`}
                   >
                     {tag}
                     <button
