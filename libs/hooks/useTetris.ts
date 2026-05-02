@@ -11,6 +11,7 @@ interface Tetromino {
 
 const COLS = 10
 const ROWS = 20
+const GAME_SPEED = 400
 
 const TETROMINOS: Record<string, Tetromino> = {
   I: {
@@ -241,7 +242,7 @@ export const useTetris = () => {
 
   useEffect(() => {
     if (gameOver || !activePiece) return
-    const interval = setInterval(moveDown, 800)
+    const interval = setInterval(moveDown, GAME_SPEED)
     return () => clearInterval(interval)
   }, [moveDown, gameOver, activePiece])
 

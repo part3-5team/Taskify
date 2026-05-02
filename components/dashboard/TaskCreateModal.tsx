@@ -15,18 +15,20 @@ import { createCard } from '@/libs/api/card/createCard'
 import { uploadCardImage } from '@/libs/api/card/uploadCardImage'
 import { Member, Card } from '@/libs/types/Dashboard'
 
+const DEFAULT_TAG_OPTIONS = ['프로젝트', '일정', '공부', '버그']
+
 function getTagColorClasses(label: string) {
   if (label === '프로젝트') return 'bg-profile-blue text-white'
   if (label === '일정') return 'bg-profile-yellow text-white'
   if (label === '공부') return 'bg-profile-cyan text-white'
   if (label === '버그') return 'bg-red-500 text-white'
-  
+
   const colors = [
     'bg-profile-rose text-white',
     'bg-profile-orange text-white',
     'bg-profile-violet text-white',
     'bg-brand-500 text-white',
-    'bg-profile-green text-white'
+    'bg-profile-green text-white',
   ]
   const index = label.length % colors.length
   return colors[index]
@@ -59,6 +61,7 @@ export default function TaskCreateModal({
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [showDefaultTags, setShowDefaultTags] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -151,14 +154,25 @@ export default function TaskCreateModal({
     })
   }
 
+  const handleAddDefaultTag = (tag: string) => {
+    if (!tags.includes(tag)) {
+      setTags((prev) => [...prev, tag])
+    }
+    setShowDefaultTags(false) // 선택 후 닫기
+  }
+
   return (
     <ModalLayout
       onClose={onClose}
-      className="bg-modal w-full max-w-[500px] overflow-y-auto rounded-2xl p-7 text-left"
+      className="bg-modal h-screen w-screen overflow-y-auto rounded-none border-0 p-4 text-left md:h-auto md:w-full md:max-w-[500px] md:rounded-2xl md:border md:p-7"
     >
       <div className="mb-8 flex items-center justify-between">
         <h2 className="text-2xl-24-bold text-gray-100">할 일 생성</h2>
-        <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-100">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-400 hover:text-gray-100"
+        >
           <IconX className="h-6 w-6" />
         </button>
       </div>
@@ -216,11 +230,12 @@ export default function TaskCreateModal({
               users={dropdownUsers}
               onSelect={(user) => setAssigneeUserId(user.id)}
               placeholder="담당자 선택"
+              showProfileImage={true}
             />
           </div>
         </div>
 
-        <div>
+        <div className="relative">
           <label className="mb-2 block text-sm font-semibold text-gray-100">
             태그
           </label>
@@ -231,7 +246,7 @@ export default function TaskCreateModal({
                 return (
                   <span
                     key={tag}
-                    className={`flex items-center gap-1 text-xs-12-medium rounded px-2 py-0.5 ${colorClasses}`}
+                    className={`text-xs-12-medium flex items-center gap-1 rounded px-2 py-0.5 ${colorClasses}`}
                   >
                     {tag}
                     <button
@@ -251,7 +266,24 @@ export default function TaskCreateModal({
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagKeyDown}
+            onFocus={() => setShowDefaultTags(true)}
+            onBlur={() => setTimeout(() => setShowDefaultTags(false), 100)} // 클릭 이벤트를 위해 약간의 지연
           />
+          {/* 기본 태그 추천 목록 */}
+          {showDefaultTags && (
+            <div className="bg-modal absolute z-10 mt-2 flex w-full flex-wrap gap-2 rounded-md border border-gray-700 p-3 shadow-lg">
+              {DEFAULT_TAG_OPTIONS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleAddDefaultTag(tag)}
+                  className={`cursor-pointer rounded px-2 py-1 text-xs transition-opacity hover:opacity-80 ${getTagColorClasses(tag)}`}
+                >
+                  + {tag}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
