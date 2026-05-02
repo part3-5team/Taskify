@@ -36,9 +36,12 @@ export default function DropdownButton({
 
   const dropDownIcon = visualState === 'active' ? <IconUp /> : <IconDown />
 
+  const BORDER_STYLE =
+    visualState === 'active' ? 'border-gray-400' : 'border-gray-700'
+
   return (
     <div
-      className={`bg-black-400 flex items-center justify-between rounded-xl border px-4 ${
+      className={`bg-black-400 flex items-center justify-between rounded-xl border ${BORDER_STYLE} px-4 ${
         sizeClass[size]
       } ${stateClass[visualState]}`}
       onClick={onClick}

@@ -164,7 +164,7 @@ export default function TaskCreateModal({
   return (
     <ModalLayout
       onClose={onClose}
-      className="bg-modal w-full max-w-[500px] overflow-y-auto rounded-2xl p-7 text-left"
+      className="bg-modal h-screen w-screen overflow-y-auto rounded-none border-0 p-4 text-left md:h-auto md:w-full md:max-w-[500px] md:rounded-2xl md:border md:p-7"
     >
       <div className="mb-8 flex items-center justify-between">
         <h2 className="text-2xl-24-bold text-gray-100">할 일 생성</h2>
@@ -236,8 +236,6 @@ export default function TaskCreateModal({
         </div>
 
         <div className="relative">
-          {' '}
-          {/* 목록 위치를 잡기 위해 relative 추가 */}
           <label className="mb-2 block text-sm font-semibold text-gray-100">
             태그
           </label>
@@ -273,13 +271,13 @@ export default function TaskCreateModal({
           />
           {/* 기본 태그 추천 목록 */}
           {showDefaultTags && (
-            <div className="absolute z-10 mt-2 flex w-full flex-wrap gap-2 rounded-xl border border-gray-700 bg-gray-900 p-3 shadow-lg">
+            <div className="bg-modal absolute z-10 mt-2 flex w-full flex-wrap gap-2 rounded-md border border-gray-700 p-3 shadow-lg">
               {DEFAULT_TAG_OPTIONS.map((tag) => (
                 <button
                   key={tag}
                   type="button"
                   onClick={() => handleAddDefaultTag(tag)}
-                  className={`rounded px-2 py-1 text-xs transition-opacity hover:opacity-80 ${getTagColorClasses(tag)}`}
+                  className={`cursor-pointer rounded px-2 py-1 text-xs transition-opacity hover:opacity-80 ${getTagColorClasses(tag)}`}
                 >
                   + {tag}
                 </button>
