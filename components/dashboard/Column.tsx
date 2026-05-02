@@ -41,7 +41,7 @@ export default function Column({
   }
 
   return (
-    <div className="flex h-full w-[350px] flex-shrink-0 flex-col">
+    <div className="flex h-full w-full flex-shrink-0 flex-col lg:w-[350px]">
       {/* 컬럼 헤더 */}
       <div className="flex items-center justify-between p-5">
         <div className="flex items-center gap-2">
