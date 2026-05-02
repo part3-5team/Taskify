@@ -190,4 +190,4 @@ src/
 | 이수진 | 박승현 | 최유현 | 장현서 |
 | --- | --- | --- | --- |
 | <img width="460" height="460" alt="1" src="https://github.com/user-attachments/assets/331ebe7a-4c13-4c55-b0f3-387cd015fc87" /> | <img width="420" height="420" alt="2" src="https://github.com/user-attachments/assets/98104a99-74e3-4fe0-a19d-e28fc2ce401d" /> | <img width="460" height="460" alt="4" src="https://github.com/user-attachments/assets/40edafb6-2970-4e1c-8af1-3449db8e10cc" /> | <img width="420" height="420" alt="3" src="https://github.com/user-attachments/assets/05271d7c-d0bd-408a-97b5-260688ead424" /> |
-| **github**: [isuzzi](https://github.com/isuzzi) | **github**: [hanpla](https://github.com/hanpla) | **github**: [Choiyuhyeon](https://github.com/Choiyuhyeon) | **github**: [hhhnseo]([https://github.com/jiwonll](https://github.com/hhhnseo)) |
+| **github**: [isuzzi](https://github.com/isuzzi) | **github**: [hanpla](https://github.com/hanpla) | **github**: [Choiyuhyeon](https://github.com/Choiyuhyeon) | **github**: [hhhnseo](https://github.com/hhhnseo) |
