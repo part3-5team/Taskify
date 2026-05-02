@@ -131,7 +131,7 @@ export default function TaskEditModal({
   return (
     <ModalLayout
       onClose={onClose}
-      className="bg-modal flex max-h-[calc(100dvh-32px)] w-full flex-col rounded-2xl p-7 text-left md:max-w-[500px]"
+      className="bg-modal flex max-h-full flex-col rounded-none border-none p-7 text-left md:max-w-[500px] md:rounded-2xl"
     >
       {/* 헤더 */}
       <div className="mb-8 flex items-center justify-between">
