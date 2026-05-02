@@ -16,6 +16,8 @@ import AddColumnButton from '@/components/dashboard/AddColumnButton'
 import TaskDetailModal from '@/components/dashboard/TaskDetailModal'
 import TaskCreateModal from '@/components/dashboard/TaskCreateModal'
 import { createColumn } from '@/libs/api/column/createColumn'
+import { updateColumn } from '@/libs/api/column/updateColumn'
+import { deleteColumn } from '@/libs/api/column/deleteColumn'
 import { updateCard } from '@/libs/api/card/updateCard'
 import {
   Member,
@@ -24,6 +26,7 @@ import {
 } from '@/libs/types/Dashboard'
 import { deleteCard } from '@/libs/api/cards/deleteCard'
 import DeleteConfirmModal from './deleteConfirmModal'
+import ColumnEditModal from './ColumnEditModal'
 
 export interface ServerColumnWithCards extends ServerColumn {
   serverCards: ServerCard[]
@@ -89,6 +92,12 @@ export default function DashboardClient({
   const [deleteTargetCardId, setDeleteTargetCardId] = useState<number | null>(
     null,
   )
+  const [editTargetColumnId, setEditTargetColumnId] = useState<string | null>(
+    null,
+  )
+  const [deleteTargetColumnId, setDeleteTargetColumnId] = useState<
+    string | null
+  >(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -238,6 +247,34 @@ export default function DashboardClient({
     )
   }
 
+  const handleEditColumnConfirm = async (title: string) => {
+    if (!editTargetColumnId) return
+    const result = await updateColumn(Number(editTargetColumnId), { title })
+    if (result.success && result.data) {
+      const newTitle = result.data.title
+      setColumns((prev) =>
+        prev.map((col) =>
+          col.id === editTargetColumnId ? { ...col, title: newTitle } : col,
+        ),
+      )
+    } else {
+      alert(result.error || '컬럼 수정에 실패했습니다.')
+    }
+  }
+
+  const handleDeleteColumnConfirm = async () => {
+    if (!deleteTargetColumnId) return
+    const result = await deleteColumn(Number(deleteTargetColumnId))
+    if (result.success) {
+      setColumns((prev) =>
+        prev.filter((col) => col.id !== deleteTargetColumnId),
+      )
+      setDeleteTargetColumnId(null)
+    } else {
+      alert(result.error || '컬럼 삭제에 실패했습니다.')
+    }
+  }
+
   const handleRequestDeleteCard = (cardId: number) => {
     setDeleteTargetCardId(cardId)
   }
@@ -288,6 +325,8 @@ export default function DashboardClient({
                 setActiveColumnStringId(column.id)
                 setIsCreateModalOpen(true)
               }}
+              onEditClick={() => setEditTargetColumnId(column.id)}
+              onDeleteClick={() => setDeleteTargetColumnId(column.id)}
             >
               {column.cards.map((card) => (
                 <Card
@@ -356,6 +395,23 @@ export default function DashboardClient({
         variant="card"
         onCancel={() => setDeleteTargetCardId(null)}
         onDelete={handleDeleteCard}
+      />
+
+      {editTargetColumnId !== null && (
+        <ColumnEditModal
+          initialTitle={
+            columns.find((col) => col.id === editTargetColumnId)?.title || ''
+          }
+          onClose={() => setEditTargetColumnId(null)}
+          onConfirm={handleEditColumnConfirm}
+        />
+      )}
+
+      <DeleteConfirmModal
+        isOpen={deleteTargetColumnId !== null}
+        variant="column"
+        onCancel={() => setDeleteTargetColumnId(null)}
+        onDelete={handleDeleteColumnConfirm}
       />
     </div>
   )

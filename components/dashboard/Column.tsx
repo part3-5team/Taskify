@@ -11,6 +11,8 @@ interface ColumnProps {
   title: string
   children?: React.ReactNode
   onAddCard?: () => void
+  onEditClick?: () => void
+  onDeleteClick?: () => void
 }
 
 export default function Column({
@@ -18,6 +20,8 @@ export default function Column({
   title,
   children,
   onAddCard,
+  onEditClick,
+  onDeleteClick,
 }: ColumnProps) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const toggleMenu = () => setIsMenuOpen((prev) => !prev)
@@ -27,11 +31,13 @@ export default function Column({
   })
 
   const handleEditClick = () => {
-    console.log('수정하기 버튼 클릭')
+    onEditClick?.()
+    setIsMenuOpen(false)
   }
 
   const handleDeleteClick = () => {
-    console.log('삭제하기 버튼 클릭')
+    onDeleteClick?.()
+    setIsMenuOpen(false)
   }
 
   return (
@@ -67,7 +73,7 @@ export default function Column({
 
             {/* 절대좌표 */}
             {isMenuOpen && (
-              <div className="absolute top-full right-0 mt-2">
+              <div className="absolute top-full right-0 z-10 mt-2">
                 <PopdoverMenu
                   onClose={() => setIsMenuOpen(false)}
                   onEditClick={handleEditClick}
