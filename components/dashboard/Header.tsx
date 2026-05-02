@@ -49,7 +49,7 @@ const HeaderActionButton = ({
   )
 }
 
-const DashboardMobileButton = () => {
+export const DashboardMobileButton = () => {
   const handleSideMenuClick = () => {
     const sidebars = document.querySelectorAll('.sidebar')
 
@@ -61,7 +61,7 @@ const DashboardMobileButton = () => {
 
   return (
     <button onClick={handleSideMenuClick} className="text-gray-300 md:hidden">
-      <MobileSideMenuButton />
+      <MobileSideMenuButton className="h-5 w-5" />
     </button>
   )
 }
@@ -106,7 +106,7 @@ export default function Header() {
   }, [dashboardId])
 
   return (
-    <header className="bg-bg border-black-300 flex h-18 w-full items-center justify-between border-b-2 p-7.5 md:justify-end">
+    <header className="bg-bg border-black-300 flex h-[50px] w-full items-center justify-between border-b-2 py-[10px] pr-5 pl-[10px] md:justify-end md:p-7.5">
       <DashboardMobileButton />
       <nav className="flex gap-4">
         {!isMyDashboard && (

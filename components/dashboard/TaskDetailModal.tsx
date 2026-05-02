@@ -247,9 +247,9 @@ export default function TaskDetailModal({
     <>
       <ModalLayout
         onClose={onClose}
-        className="flex w-full max-w-[730px] flex-col overflow-hidden text-left md:flex-row"
+        className="flex h-dvh w-screen max-w-none flex-col overflow-hidden rounded-none text-left md:h-auto md:max-h-[90vh] md:w-full md:max-w-[730px] md:flex-row md:rounded-2xl"
       >
-        <div className="flex-1 p-7.5">
+        <div className="flex-1 overflow-y-auto p-5 md:p-7.5">
           <div className="mb-4 flex items-start justify-between">
             <h2 className="text-2xl-24-bold text-gray-100">{card.title}</h2>
 
@@ -369,7 +369,7 @@ export default function TaskDetailModal({
             </div>
           </div>
 
-          <div className="mb-6">
+          <div className="text-lg-16-medium mb-6">
             <CommentInput
               profileName={myInfo?.nickname}
               profileImageUrl={myInfo?.profileImageUrl}
