@@ -7,6 +7,7 @@ import Dropdown from '@/components/common/dropdown/Dropdown'
 import Button from '@/components/common/button'
 import IconX from '@/assets/icons/ic_X.svg'
 import IconImage from '@/assets/icons/ic_image.svg'
+import { uploadCardImage } from '@/libs/api/card/uploadCardImage'
 
 import { editCard } from '@/libs/api/cards/editCard'
 import type { CardDetail } from '@/libs/types/Card'
@@ -72,6 +73,17 @@ export default function TaskEditModal({
     try {
       setIsSubmitting(true)
 
+      let nextImageUrl: string | null = imageUrl
+      if (imageFile) {
+        const uploadResult = await uploadCardImage(columnId, imageFile)
+        nextImageUrl = uploadResult.data?.imageUrl ?? null
+
+        if (!uploadResult.success) {
+          alert(uploadResult.error ?? '이미지 업로드에 실패했습니다.')
+          return
+        }
+      }
+
       const updatedCard = await editCard({
         cardId: card.id,
         columnId,
@@ -80,7 +92,7 @@ export default function TaskEditModal({
         description: description.trim(),
         dueDate: dueDate || null,
         tags,
-        imageUrl,
+        imageUrl: nextImageUrl,
       })
 
       onEdited(updatedCard)
@@ -131,7 +143,7 @@ export default function TaskEditModal({
   return (
     <ModalLayout
       onClose={onClose}
-      className="bg-modal flex max-h-full flex-col rounded-none border-none p-7 text-left md:max-w-[500px] md:rounded-2xl"
+      className="bg-modal w-ful flex max-h-[90%] flex-col rounded-none border-none p-7 text-left md:w-[500px] md:rounded-2xl"
     >
       {/* 헤더 */}
       <div className="mb-8 flex items-center justify-between">
@@ -260,7 +272,7 @@ export default function TaskEditModal({
           </label>
           <div
             className="relative flex h-[140px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-gray-700 bg-gray-900 transition-colors hover:bg-gray-800"
-            onClick={() => !imageFile && fileInputRef.current?.click()}
+            onClick={() => fileInputRef.current?.click()}
           >
             {previewSrc ? (
               <>
