@@ -6,9 +6,12 @@ import TextArea from '@/components/common/textArea'
 import Dropdown from '@/components/common/dropdown/Dropdown'
 import Button from '@/components/common/button'
 import IconX from '@/assets/icons/ic_X.svg'
+import IconImage from '@/assets/icons/ic_image.svg'
+import { uploadCardImage } from '@/libs/api/card/uploadCardImage'
+
 import { editCard } from '@/libs/api/cards/editCard'
 import type { CardDetail } from '@/libs/types/Card'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import type { Member } from '@/libs/types/Dashboard'
 
 type EditColumn = {
@@ -43,22 +46,23 @@ export default function TaskEditModal({
   const [assigneeUserId, setAssigneeUserId] = useState<number | null>(
     card.assignee?.id ?? null,
   )
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const previewSrc = imagePreview ?? imageUrl
 
   const isDisabled = title.trim() === '' || description.trim() === ''
 
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter') return
-
-    e.preventDefault()
-
-    const newTag = tagInput.trim()
-    if (!newTag) return
-    if (tags.includes(newTag)) return
-
-    setTags((prev) => [...prev, newTag])
-    setTagInput('')
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const trimmed = tagInput.trim()
+      if (trimmed && !tags.includes(trimmed)) {
+        setTags((prev) => [...prev, trimmed])
+      }
+      setTagInput('')
+    }
   }
-
   const handleRemoveTag = (targetTag: string) => {
     setTags((prev) => prev.filter((tag) => tag !== targetTag))
   }
@@ -69,6 +73,17 @@ export default function TaskEditModal({
     try {
       setIsSubmitting(true)
 
+      let nextImageUrl: string | null = imageUrl
+      if (imageFile) {
+        const uploadResult = await uploadCardImage(columnId, imageFile)
+        nextImageUrl = uploadResult.data?.imageUrl ?? null
+
+        if (!uploadResult.success) {
+          alert(uploadResult.error ?? '이미지 업로드에 실패했습니다.')
+          return
+        }
+      }
+
       const updatedCard = await editCard({
         cardId: card.id,
         columnId,
@@ -77,7 +92,7 @@ export default function TaskEditModal({
         description: description.trim(),
         dueDate: dueDate || null,
         tags,
-        imageUrl,
+        imageUrl: nextImageUrl,
       })
 
       onEdited(updatedCard)
@@ -90,19 +105,45 @@ export default function TaskEditModal({
     }
   }
 
-  const getTagColor = (tag: string) => {
-    if (tag === '할 일') return 'bg-profile-orange text-white'
-    if (tag === '프로젝트') return 'bg-profile-blue text-white'
-    if (tag === '디자인') return 'bg-profile-violet text-white'
-    if (tag === '버그') return 'bg-profile-rose text-white'
+  function getTagColorClasses(label: string) {
+    if (label === '프로젝트') return 'bg-profile-blue text-white'
+    if (label === '일정') return 'bg-profile-yellow text-white'
+    if (label === '공부') return 'bg-profile-cyan text-white'
+    if (label === '버그') return 'bg-red-500 text-white'
 
-    return 'bg-brand-500 text-white'
+    const colors = [
+      'bg-profile-rose text-white',
+      'bg-profile-orange text-white',
+      'bg-profile-violet text-white',
+      'bg-brand-500 text-white',
+      'bg-profile-green text-white',
+    ]
+    const index = label.length % colors.length
+    return colors[index]
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    e.target.value = ''
+  }
+
+  const handleRemoveImage = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
+
+    setImageFile(null)
+    setImagePreview(null)
+    setImageUrl(null)
   }
 
   return (
     <ModalLayout
       onClose={onClose}
-      className="bg-modal w-full max-w-[500px] overflow-hidden rounded-2xl p-7 text-left"
+      className="bg-modal w-ful flex max-h-[90%] flex-col rounded-none border-none p-7 text-left md:w-[500px] md:rounded-2xl"
     >
       {/* 헤더 */}
       <div className="mb-8 flex items-center justify-between">
@@ -112,7 +153,7 @@ export default function TaskEditModal({
         </button>
       </div>
 
-      <div className="space-y-6">
+      <div className="scrollbar-thin min-h-0 flex-1 space-y-6 overflow-y-auto py-4 pr-2">
         {/* 제목 */}
         <div>
           <label className="mb-2 block text-sm font-semibold text-gray-100">
@@ -193,71 +234,95 @@ export default function TaskEditModal({
           <label className="mb-2 block text-sm font-semibold text-gray-100">
             태그
           </label>
-
-          <div className="relative flex min-h-[48px] flex-wrap items-center gap-2 rounded-xl border border-gray-700 bg-gray-900 px-4 py-2 focus-within:border-blue-100">
-            <div className="flex flex-wrap gap-1.5">
-              {tags.map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className={`text-xs-12-medium rounded px-2 py-0.5 ${getTagColor(tag)}`}
-                >
-                  {tag} x
-                </button>
-              ))}
+          {tags.length > 0 && (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {tags.map((tag) => {
+                const colorClasses = getTagColorClasses(tag)
+                return (
+                  <span
+                    key={tag}
+                    className={`text-xs-12-medium flex items-center gap-1 rounded px-2 py-0.5 ${colorClasses}`}
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tag)}
+                      className="ml-0.5 opacity-60 hover:opacity-100"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )
+              })}
             </div>
-            <input
-              type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={handleAddTag}
-              className="min-w-[100px] flex-1 bg-transparent text-sm text-gray-100 placeholder-gray-500 outline-none"
-              placeholder="입력 후 Enter"
-            />
-          </div>
+          )}
+
+          <Input
+            placeholder="입력 후 Enter"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleTagKeyDown}
+          />
         </div>
 
         {/* 이미지 */}
-        {imageUrl && (
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-gray-100">
-              이미지
-            </label>
-
-            <div className="relative h-[140px] w-[200px] overflow-hidden rounded-xl border border-gray-700 bg-gray-900">
-              {/* The X button */}
-              <button
-                type="button"
-                onClick={() => setImageUrl(null)}
-                className="absolute top-2 right-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
-              >
-                <IconX className="h-4 w-4" />
-              </button>
-
-              <img
-                src={imageUrl}
-                alt="카드 이미지"
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* 푸터 버튼 */}
-        <div className="mt-8 flex gap-3">
-          <Button variant="cancel" className="flex-1" onClick={onClose}>
-            취소
-          </Button>
-          <Button
-            variant="primary"
-            className="flex-1"
-            disabled={isDisabled || isSubmitting}
-            onClick={handleSubmit}
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-gray-100">
+            이미지 URL
+          </label>
+          <div
+            className="relative flex h-[140px] w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-gray-700 bg-gray-900 transition-colors hover:bg-gray-800"
+            onClick={() => fileInputRef.current?.click()}
           >
-            완료
-          </Button>
+            {previewSrc ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={previewSrc}
+                  alt="미리보기"
+                  className="h-full w-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+                >
+                  ×
+                </button>
+              </>
+            ) : (
+              <>
+                <IconImage className="mb-2 h-8 w-8 text-gray-500" />
+                <span className="text-sm text-gray-500">+ image upload</span>
+              </>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
         </div>
+      </div>
+      {/* 푸터 버튼 */}
+      <div className="mt-8 flex shrink-0 gap-3">
+        <Button
+          variant="cancel"
+          className="w-full flex-1 !px-2 !py-2 whitespace-nowrap"
+          onClick={onClose}
+        >
+          취소
+        </Button>
+        <Button
+          variant="primary"
+          className="w-full flex-1 !px-2 !py-2 whitespace-nowrap"
+          disabled={isDisabled || isSubmitting}
+          onClick={handleSubmit}
+        >
+          완료
+        </Button>
       </div>
     </ModalLayout>
   )
