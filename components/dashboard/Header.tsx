@@ -11,6 +11,7 @@ import DashboardHeaderMemberList from './DashboardHeaderMemberList'
 import { getDashboardDetail } from '@/libs/api/dashboard/getDeashboardDetail'
 import MobileSideMenuButton from '@/assets/icons/ic_sidemenu.svg'
 import LogoutModal from '../common/modal/LogoutModal'
+import { useSidebar } from '@/libs/contexts/SideBarContext'
 
 const BUTTON_STYLE =
   'hover:bg-modal active:bg-black-300 flex items-center gap-2 rounded-xs px-3 py-2.5 cursor-pointer text-gray-400 text-lg-16-medium transition-colors'
@@ -50,17 +51,10 @@ const HeaderActionButton = ({
 }
 
 export const DashboardMobileButton = () => {
-  const handleSideMenuClick = () => {
-    const sidebars = document.querySelectorAll('.sidebar')
-
-    sidebars.forEach((el) => {
-      el.classList.toggle('hidden')
-      el.classList.add('flex')
-    })
-  }
+  const { toggle } = useSidebar()
 
   return (
-    <button onClick={handleSideMenuClick} className="text-gray-300 md:hidden">
+    <button onClick={toggle} className="text-gray-300 md:hidden">
       <MobileSideMenuButton className="h-5 w-5" />
     </button>
   )

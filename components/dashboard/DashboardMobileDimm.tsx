@@ -1,16 +1,21 @@
 'use client'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useSidebar } from '@/libs/contexts/SideBarContext'
 
 export default function DashboardMobileDimm() {
-  const handleClose = () => {
-    document
-      .querySelectorAll('.sidebar')
-      .forEach((el) => el.classList.add('hidden'))
-  }
+  const { isOpen, close } = useSidebar()
 
   return (
-    <div
-      onClick={handleClose}
-      className="sidebar fixed inset-0 z-40 hidden bg-black/70 md:hidden"
-    />
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={close}
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+        />
+      )}
+    </AnimatePresence>
   )
 }
