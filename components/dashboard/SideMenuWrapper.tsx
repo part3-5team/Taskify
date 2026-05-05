@@ -26,7 +26,7 @@ export default function MobileSidebarWrapper({
         )}
       </AnimatePresence>
 
-      <div className="hidden md:relative md:flex md:w-60">{children}</div>
+      <div className="hidden md:block">{children}</div>
     </>
   )
 }
