@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, ReactNode, useContext, useState } from 'react'
 
 const SidebarContext = createContext({
   isOpen: false,
@@ -8,11 +8,7 @@ const SidebarContext = createContext({
   close: () => {},
 })
 
-export const SidebarProvider = ({
-  children,
-}: {
-  children: React.ReactNode
-}) => {
+export const SidebarProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false)
   const toggle = () => setIsOpen((prev) => !prev)
   const close = () => setIsOpen(false)
