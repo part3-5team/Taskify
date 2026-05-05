@@ -2,13 +2,20 @@
 
 import { useSidebar } from '@/libs/contexts/SideBarContext'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useParams } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function MobileSidebarWrapper({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { isOpen } = useSidebar()
+  const { isOpen, close } = useSidebar()
+  const { id } = useParams()
+
+  useEffect(() => {
+    close()
+  }, [id])
 
   return (
     <>

@@ -76,12 +76,6 @@ export default function Header() {
   useEffect(() => {
     let ignore = false
 
-    const sidebars = document.querySelectorAll('.sidebar')
-
-    sidebars.forEach((el) => {
-      el.classList.add('hidden')
-    })
-
     const fetchDetail = async () => {
       const res = await getDashboardDetail(Number(dashboardId))
 
