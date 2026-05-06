@@ -35,7 +35,7 @@ export default function ColumnAddModal({
         </label>
         <Input
           type="text"
-          placeholder="새로운 프로젝트"
+          placeholder="새로운 컬럼"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           state="default"
