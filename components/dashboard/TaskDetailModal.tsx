@@ -42,6 +42,7 @@ interface TaskDetailModalProps {
   members: Member[]
   onClose: () => void
   onRequestDelete?: (cardId: number) => void
+  isDashboardOwnder?: boolean
 }
 
 export default function TaskDetailModal({
@@ -52,6 +53,7 @@ export default function TaskDetailModal({
   members,
   onClose,
   onRequestDelete,
+  isDashboardOwnder,
 }: TaskDetailModalProps) {
   const [card, setCard] = useState<CardDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -381,6 +383,9 @@ export default function TaskDetailModal({
             {comments.map((comment, idx) => {
               const isEditing = editingCommentId === comment.id
               const isLastComment = idx === comments.length - 1
+              const isMyComment = myInfo?.id === comment.author.id
+              const canEditComment = isMyComment
+              const canDeleteComment = isMyComment || isDashboardOwnder
 
               return (
                 <div
@@ -410,26 +415,32 @@ export default function TaskDetailModal({
                         </span>
                       </div>
 
-                      <div className="flex gap-2 text-[10px] text-gray-600">
-                        <button
-                          type="button"
-                          className="hover:underline"
-                          onClick={() => {
-                            setEditingCommentId(comment.id)
-                            setEditingContent(comment.content)
-                          }}
-                        >
-                          수정
-                        </button>
+                      {(canEditComment || canDeleteComment) && (
+                        <div className="flex gap-2 text-[10px] text-gray-600">
+                          {canEditComment && (
+                            <button
+                              type="button"
+                              className="hover:underline"
+                              onClick={() => {
+                                setEditingCommentId(comment.id)
+                                setEditingContent(comment.content)
+                              }}
+                            >
+                              수정
+                            </button>
+                          )}
 
-                        <button
-                          type="button"
-                          className="hover:underline"
-                          onClick={() => handleDeleteComment(comment.id)}
-                        >
-                          삭제
-                        </button>
-                      </div>
+                          {canDeleteComment && (
+                            <button
+                              type="button"
+                              className="hover:underline"
+                              onClick={() => handleDeleteComment(comment.id)}
+                            >
+                              삭제
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {isEditing ? (
