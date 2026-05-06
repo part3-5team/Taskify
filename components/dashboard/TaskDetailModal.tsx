@@ -183,7 +183,15 @@ export default function TaskDetailModal({
     if (tag === '공부') return 'bg-profile-cyan text-white'
     if (tag === '버그') return 'bg-red-500 text-white'
 
-    return 'bg-brand-500 text-white'
+    const colors = [
+      'bg-profile-rose text-white',
+      'bg-profile-orange text-white',
+      'bg-profile-violet text-white',
+      'bg-brand-500 text-white',
+      'bg-profile-green text-white',
+    ]
+    const index = tag.length % colors.length
+    return colors[index]
   }
 
   const handleCreateComment = async (value: string) => {
@@ -295,14 +303,17 @@ export default function TaskDetailModal({
 
           {tags.length > 0 && (
             <div className="mb-6 flex flex-wrap gap-1.5 border-b border-gray-700 pb-6">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className={`text-xs-12-medium rounded px-2 py-0.5 ${getTagColor(tag)}`}
-                >
-                  {tag}
-                </span>
-              ))}
+              {tags.map((tag) => {
+                const colorClasses = getTagColor(tag)
+                return (
+                  <span
+                    key={tag}
+                    className={`text-xs-12-medium rounded px-2 py-0.5 ${colorClasses}`}
+                  >
+                    {tag}
+                  </span>
+                )
+              })}
             </div>
           )}
 
