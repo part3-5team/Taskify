@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import TextArea from './textArea'
 import Button from './button'
+import DefaultProfileImg from '@/assets/imgs/img_default_profile.svg'
 
 interface CommentProps {
   profileName?: string
+  profileImageUrl?: string | null
   disabled?: boolean
   defaultValue?: string
   onSubmit?: (value: string) => void
@@ -18,13 +20,14 @@ const profileStyle =
   'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-600 text-[10px] font-medium text-white'
 
 const collapsedInputStyle =
-  'w-full h-[40px] rounded-full border border-gray-700 bg-black-400 px-4 text-white outline-none placeholder:text-gray-400 focus:border-blue-200 disabled:bg-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed'
+  'w-full h-[40px] rounded-full text-lg-16-medium border border-gray-700 bg-black-400 px-4 text-white outline-none placeholder:text-gray-400 focus:border-blue-200 disabled:bg-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed'
 
 const expandedWrapperStyle =
   'w-full rounded-[14px] border border-blue-200 bg-black-400 px-4 pt-4 pb-3'
 
 export default function Comment({
   profileName = 'name',
+  profileImageUrl,
   disabled = false,
   defaultValue = '',
   onSubmit,
@@ -57,7 +60,16 @@ export default function Comment({
 
   return (
     <div className={wrapperStyle}>
-      {!isExpanded && <div className={profileStyle}>{profileName}</div>}
+      {!isExpanded &&
+        (profileImageUrl ? (
+          <img
+            src={profileImageUrl}
+            alt="댓글 작성자 프로필"
+            className="h-8 w-8 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <DefaultProfileImg className="h-8 w-8 shrink-0 rounded-full bg-white object-cover" />
+        ))}
 
       <div className="w-full">
         {!isExpanded ? (

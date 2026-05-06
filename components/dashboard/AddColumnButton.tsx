@@ -25,7 +25,7 @@ export default function AddColumnButton({
 
   return (
     <>
-      <div className="flex w-[300px] flex-shrink-0 flex-col pt-[20px]">
+      <div className="flex w-full flex-shrink-0 flex-col lg:w-[300px]">
         <button
           onClick={handleOpenModal}
           className="bg-black-300 flex flex-row items-center justify-center gap-3 rounded-[17px] border border-none py-[24px] transition-colors hover:bg-gray-900"

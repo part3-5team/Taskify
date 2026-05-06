@@ -10,14 +10,20 @@ interface ColumnProps {
   id: string
   title: string
   children?: React.ReactNode
+  cardCount: number
   onAddCard?: () => void
+  onEditClick?: () => void
+  onDeleteClick?: () => void
 }
 
 export default function Column({
   id,
   title,
   children,
+  cardCount,
   onAddCard,
+  onEditClick,
+  onDeleteClick,
 }: ColumnProps) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const toggleMenu = () => setIsMenuOpen((prev) => !prev)
@@ -27,22 +33,23 @@ export default function Column({
   })
 
   const handleEditClick = () => {
-    console.log('수정하기 버튼 클릭')
+    onEditClick?.()
+    setIsMenuOpen(false)
   }
 
   const handleDeleteClick = () => {
-    console.log('삭제하기 버튼 클릭')
+    onDeleteClick?.()
+    setIsMenuOpen(false)
   }
 
   return (
-    <div className="flex h-full w-[350px] flex-shrink-0 flex-col">
+    <div className="flex h-full w-full flex-shrink-0 flex-col lg:w-[350px]">
       {/* 컬럼 헤더 */}
       <div className="flex items-center justify-between p-5">
         <div className="flex items-center gap-2">
           {/* TODO: 제목 왼쪽 동그란 점 */}
           <h2 className="text-lg-16-semibold text-gray-100">{title}</h2>
-          {/* 카드 개수 뱃지 */}
-          <h2 className="text-lg-16-bold text-gray-400">2</h2>
+          <h2 className="text-lg-16-bold text-gray-400">{cardCount}</h2>
         </div>
 
         {/* 플러스 및 설정 아이콘 */}
@@ -67,7 +74,7 @@ export default function Column({
 
             {/* 절대좌표 */}
             {isMenuOpen && (
-              <div className="absolute top-full right-0 mt-2">
+              <div className="absolute top-full right-0 z-10 mt-2">
                 <PopdoverMenu
                   onClose={() => setIsMenuOpen(false)}
                   onEditClick={handleEditClick}

@@ -65,3 +65,78 @@ export interface GetMembersResponse {
   members: Member[]
   totalCount: number
 }
+
+export interface Column {
+  id: number
+  title: string
+  teamId: string
+  dashboardId: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface GetColumnsResponse {
+  result: string
+  data: Column[]
+}
+
+export interface CardAssignee {
+  profileImageUrl: string | null
+  nickname: string
+  id: number
+}
+
+export interface Card {
+  id: number
+  title: string
+  description: string
+  tags: string[]
+  dueDate: string | null
+  assignee: CardAssignee | null
+  imageUrl: string | null
+  teamId: string
+  columnId: number
+  dashboardId: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface GetCardsResponse {
+  cursorId: number | null
+  totalCount: number
+  cards: Card[]
+}
+
+export interface CreateCardRequest {
+  assigneeUserId?: number
+  dashboardId: number
+  columnId: number
+  title: string
+  description: string
+  dueDate?: string
+  tags?: string[]
+  imageUrl?: string
+}
+
+export const dashboardColors = [
+  {
+    key: '#AE2E24',
+    className: 'bg-profile-rose',
+  },
+  {
+    key: '#9F4B00',
+    className: 'bg-profile-orange',
+  },
+  {
+    key: '#BD8C00',
+    className: 'bg-profile-yellow',
+  },
+  {
+    key: '#206E4E',
+    className: 'bg-profile-green',
+  },
+  {
+    key: '#1458BC',
+    className: 'bg-profile-blue',
+  },
+]

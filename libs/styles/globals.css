@@ -134,4 +134,109 @@
 
 body {
   font-family: var(--font-sans);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-black-200) var(--color-bg);
+}
+
+/* Custom Scrollbar for Webkit */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-black-200);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-black-100);
+}
+
+/* =========================================
+   React DatePicker Dark Mode Overrides
+   ========================================= */
+.react-datepicker {
+  background-color: var(--color-black-400) !important;
+  border-color: var(--color-gray-700) !important;
+  color: var(--color-gray-100) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.react-datepicker__header {
+  background-color: var(--color-black-500) !important;
+  border-bottom-color: var(--color-gray-700) !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header,
+.react-datepicker__day-name {
+  color: var(--color-gray-200) !important;
+}
+
+.react-datepicker__day {
+  color: var(--color-gray-300) !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--color-black-200) !important;
+  border-radius: 0.25rem !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--color-brand-500) !important;
+  color: #fff !important;
+  border-radius: 0.25rem !important;
+}
+
+.react-datepicker__day--disabled {
+  color: var(--color-gray-700) !important;
+}
+
+/* 타임 피커 영역 */
+.react-datepicker__time-container {
+  border-left-color: var(--color-gray-700) !important;
+}
+
+.react-datepicker__time {
+  background-color: var(--color-black-400) !important;
+}
+
+.react-datepicker__time-box,
+.react-datepicker__time-list {
+  background-color: var(--color-black-400) !important;
+  color: var(--color-gray-300) !important;
+}
+
+.react-datepicker__time-list-item:hover {
+  background-color: var(--color-black-200) !important;
+}
+
+.react-datepicker__time-list-item--selected {
+  background-color: var(--color-brand-500) !important;
+  color: #fff !important;
+}
+
+/* 네비게이션 화살표 */
+.react-datepicker__navigation-icon::before {
+  border-color: var(--color-gray-400) !important;
+}
+
+/* 팝업 꼬리(Triangle) */
+.react-datepicker-popper[data-placement^='bottom'] .react-datepicker__triangle::before,
+.react-datepicker-popper[data-placement^='top'] .react-datepicker__triangle::before {
+  border-bottom-color: var(--color-gray-700) !important;
+  border-top-color: var(--color-gray-700) !important;
+}
+
+.react-datepicker-popper[data-placement^='bottom'] .react-datepicker__triangle::after,
+.react-datepicker-popper[data-placement^='top'] .react-datepicker__triangle::after {
+  border-bottom-color: var(--color-black-500) !important;
+  border-top-color: var(--color-black-500) !important;
 }

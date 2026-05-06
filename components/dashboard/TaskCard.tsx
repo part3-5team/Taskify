@@ -2,21 +2,36 @@
 'use client'
 import React from 'react'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
-
-interface TagData {
-  id: number
-  label: string
-}
+import DefaultProfileImg from '@/assets/imgs/img_default_profile.svg'
 
 interface TaskCardProps {
-  id: string
+  id: number | string
   title: string
-  tags?: TagData[]
+  tags?: string[]
   dueDate?: string
   assigneeName?: string
+  assigneeProfileImageUrl?: string | null
+  imageUrl?: string | null
   hasImage?: boolean
   isOverlay?: boolean
   onClick?: () => void
+}
+
+function getTagColorClasses(label: string) {
+  if (label === '프로젝트') return 'bg-profile-blue text-white'
+  if (label === '일정') return 'bg-profile-yellow text-white'
+  if (label === '공부') return 'bg-profile-cyan text-white'
+  if (label === '버그') return 'bg-red-500 text-white'
+
+  const colors = [
+    'bg-profile-rose text-white',
+    'bg-profile-orange text-white',
+    'bg-profile-violet text-white',
+    'bg-brand-500 text-white',
+    'bg-profile-green text-white',
+  ]
+  const index = label.length % colors.length
+  return colors[index]
 }
 
 export default function TaskCard({
@@ -25,6 +40,8 @@ export default function TaskCard({
   tags = [],
   dueDate,
   assigneeName,
+  assigneeProfileImageUrl,
+  imageUrl,
   hasImage = false,
   isOverlay = false,
   onClick,
@@ -52,21 +69,62 @@ export default function TaskCard({
     setDroppableRef(node)
   }
 
+  const shouldShowImage = Boolean(imageUrl) || hasImage
+
+  const getDay = (dueDate?: string): string | null => {
+    if (!dueDate) return null
+
+    const today = new Date()
+    const due = new Date(dueDate)
+
+    today.setHours(0, 0, 0, 0)
+    due.setHours(0, 0, 0, 0)
+
+    const diff = Math.ceil(
+      (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    )
+
+    if (diff < 0) return null
+    if (diff > 3) return null
+
+    return diff === 0 ? 'D-Day' : `D-${diff}`
+  }
+
+  const dDay = getDay(dueDate)
+  const isUrgent = dDay === 'D-1'
+
   return (
     <div
       ref={isOverlay ? undefined : setNodeRef}
       {...(isOverlay ? {} : listeners)}
       {...(isOverlay ? {} : attributes)}
       onClick={isOverlay ? undefined : onClick}
-      className={`border-black-200 cursor-grab rounded-xl border p-4 transition-all ${
+      className={`border-black-200 relative cursor-grab rounded-xl border p-4 transition-all ${
+        isUrgent ? 'border-red-400' : 'border-none'
+      } ${
         isDragging && !isOverlay
           ? 'opacity-30'
           : 'bg-black-300 hover:bg-black-200'
       } ${isOverlay ? 'cursor-grabbing shadow-xl' : ''}`}
     >
+      {/* 디데이 뱃지 */}
+      {typeof dDay === 'string' && dDay.length > 0 && (
+        <span className="text-xs-12-semibold absolute top-3 right-3 rounded-2xl bg-red-400 px-2 py-0.5 text-white">
+          {dDay}
+        </span>
+      )}
+
       {/* 1. 이미지 (썸네일) 영역 - 일단 회색 박스로 대체 */}
-      {hasImage && (
-        <div className="bg-black-200 mb-3 h-[160px] w-full rounded-lg"></div>
+      {shouldShowImage && (
+        <div className="mb-3 h-[160px] w-full rounded-lg">
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt="할 일 이미지"
+              className="h-full w-full object-cover"
+            />
+          )}
+        </div>
       )}
 
       {/* 2. 카드 제목 */}
@@ -75,23 +133,15 @@ export default function TaskCard({
       {/* 3. 태그 뱃지 */}
       {tags.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-1.5">
-          {tags.map((tag) => {
-            let colorClasses = 'bg-brand-500 text-white'
-            if (tag.label === '프로젝트')
-              colorClasses = 'bg-profile-blue text-white'
-            else if (tag.label === '일정')
-              colorClasses = 'bg-profile-yellow text-white'
-            else if (tag.label === '공부')
-              colorClasses = 'bg-profile-cyan text-white'
-            else if (tag.label === '버그')
-              colorClasses = 'bg-red-500 text-white'
+          {tags.map((tag, idx) => {
+            const colorClasses = getTagColorClasses(tag)
 
             return (
               <span
-                key={tag.id}
+                key={`${idx}-${tag}`}
                 className={`text-xs-12-medium rounded px-2 py-0.5 ${colorClasses}`}
               >
-                {tag.label}
+                {tag}
               </span>
             )
           })}
@@ -108,9 +158,15 @@ export default function TaskCard({
         {/* 담당자 아바타 (임시 원형 프로필) */}
         {assigneeName && (
           <div className="flex items-center gap-1.5">
-            <div className="bg-profile-violet flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold text-white">
-              {assigneeName.charAt(0)}
-            </div>
+            {assigneeProfileImageUrl ? (
+              <img
+                src={assigneeProfileImageUrl}
+                alt="담당자 프로필"
+                className="h-6 w-6 rounded-full object-cover"
+              />
+            ) : (
+              <DefaultProfileImg className="h-6 w-6 rounded-full bg-white" />
+            )}
             <span className="text-xs-12-medium text-gray-500">
               {assigneeName}
             </span>

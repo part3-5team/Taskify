@@ -1,16 +1,19 @@
 import Link from 'next/link'
 import HashIcon from '@/assets/icons/ic_hash.svg'
+import IconCrown from '@/assets/icons/ic_crown.svg'
 
 interface SidebarDashboardItemProps {
   label: string
   href: string
   color?: string
+  createdByMe: boolean
 }
 
 export default function SidebarDashboardItem({
   label,
   href,
   color,
+  createdByMe,
 }: SidebarDashboardItemProps) {
   return (
     <li className="mb-1">
@@ -23,7 +26,8 @@ export default function SidebarDashboardItem({
           className="h-5 w-5 shrink-0"
           style={{ color: color ?? 'currentColor' }}
         />
-        {label}
+        <span className="max-w-[150px] truncate">{label}</span>
+        {createdByMe && <IconCrown className="text-brand-600 shrink-0" />}
       </Link>
     </li>
   )

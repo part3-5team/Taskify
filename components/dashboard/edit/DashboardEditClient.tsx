@@ -1,22 +1,22 @@
 'use client'
 
-import { DashboardColor } from './mock'
 import { useEffect, useState } from 'react'
 import DashboardSidebar from './DashboardSidebar'
 import DashboardEditSection from './DashboardEditSection'
 import MemberManagementSection from './MemberManagementSection'
 import InviteMemberModal from './InviteMemberModal'
 import { useRouter } from 'next/navigation'
-import Menu from '@/assets/icons/ic_sidemenu.svg'
+import MenuIcon from '@/assets/icons/ic_sidemenu.svg'
 import DeleteConfirmModal from '../deleteConfirmModal'
 import { inviteDashboard } from '@/libs/api/dashboard/inviteDashboard'
 import { getInvitations } from '@/libs/api/dashboard/sentInvitations'
 import { cancelInvitation } from '@/libs/api/dashboard/cancelInvitations'
-import { Invitation, Member } from '@/libs/types/Dashboard'
 import { getMembers } from '@/libs/api/dashboard/getMembers'
 import { deleteMember } from '@/libs/api/dashboard/deleteMember'
 import { deleteDashboard } from '@/libs/api/dashboard/deleteDashboard'
+import { Invitation, Member } from '@/libs/types/Dashboard'
 import { updateDashboard } from '@/libs/api/dashboard/updateDashboard'
+import { getDashboardDetail } from '@/libs/api/dashboard/getDeashboardDetail'
 
 interface DashboardEditClientProps {
   dashboardId: string
@@ -31,8 +31,8 @@ export default function DashboardEditClient({
   const router = useRouter()
 
   const [selectedTab, setSelectedTab] = useState<'edit' | 'members'>('edit')
-  const [dashboardTitle, setDashboardTitle] = useState('계란말이 만들기')
-  const [selectedColor, setSelectedColor] = useState<DashboardColor>('red')
+  const [dashboardTitle, setDashboardTitle] = useState('')
+  const [selectedColor, setSelectedColor] = useState<string | null>(null)
 
   const [members, setMembers] = useState<Member[]>([])
   const [memberTotalCount, setMemberTotalCount] = useState(0)
@@ -54,6 +54,22 @@ export default function DashboardEditClient({
     1,
     Math.ceil(inviteTotalCount / INVITE_PAGE_SIZE),
   )
+
+  useEffect(() => {
+    const fetchDashboardDetail = async () => {
+      const result = await getDashboardDetail(Number(dashboardId))
+
+      if (!result.success || !result.data) {
+        alert(result.error ?? '대시보드 정보를 가져오지 못했습니다')
+        return
+      }
+
+      setDashboardTitle(result.data.title)
+      setSelectedColor(result.data.color)
+    }
+
+    fetchDashboardDetail()
+  }, [dashboardId])
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -95,6 +111,26 @@ export default function DashboardEditClient({
     fetchInvitations()
   }, [dashboardId, invitePage])
 
+  const handleUpdateDashboard = async () => {
+    if (!selectedColor) {
+      alert('대시보드 색상을 선택해주세요')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('title', dashboardTitle)
+    formData.append('color', selectedColor)
+
+    const result = await updateDashboard(Number(dashboardId), formData)
+
+    if (!result.success) {
+      alert(result.error ?? '대시보드 수정에 실패했습니다.')
+      return
+    }
+
+    alert('대시보드가 성공적으로 수정되었습니다.')
+  }
+
   const handleDeleteDashboard = () => {
     setIsDeleteModalOpen(true)
   }
@@ -110,7 +146,6 @@ export default function DashboardEditClient({
     }
 
     setIsDeleteModalOpen(false)
-
     router.push('/mydashboard')
   }
 
@@ -219,26 +254,6 @@ export default function DashboardEditClient({
     return true
   }
 
-  const handleUpdateDashboard = async () => {
-    const formData = new FormData()
-    formData.append('title', dashboardTitle)
-    formData.append('color', selectedColor)
-
-    try {
-      const res = await updateDashboard(Number(dashboardId), formData)
-
-      if (!res.success) {
-        alert(res.error)
-        return
-      }
-
-      alert('대시보드가 성공적으로 수정되었습니다.')
-    } catch (error) {
-      console.error('Dashboard update error:', error)
-      alert('알 수 없는 오류가 발생했습니다.')
-    }
-  }
-
   const handleBack = () => {
     router.push(`/dashboard/${dashboardId}`)
   }
@@ -248,10 +263,12 @@ export default function DashboardEditClient({
     setIsMobileSidebarOpen(false)
   }
 
+  if (!selectedColor) return null
+
   return (
     <>
       <div className="bg-modal min-h-screen text-white">
-        <div className="flex min-h-screen w-full flex-col md:flex-row lg:min-w-[1280px]">
+        <div className="flex min-h-screen w-full flex-col md:flex-row">
           <div className="hidden md:block">
             <DashboardSidebar
               selectedTab={selectedTab}
@@ -288,7 +305,7 @@ export default function DashboardEditClient({
                 className="flex items-center justify-center"
                 aria-label="사이드바 열기"
               >
-                <Menu className="size-5 md:hidden" />
+                <MenuIcon className="size-5 md:hidden" />
               </button>
             </header>
 

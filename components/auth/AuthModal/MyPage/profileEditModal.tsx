@@ -1,25 +1,26 @@
-'use client';
+'use client'
 
-import { useRef, useState } from 'react';
-import CloseIcon from '@/assets/icons/ic_X.svg';
-import Button from '@/components/common/button';
-import Input from '@/components/common/input';
-import PasswordChangeModal from './passwordChangeModal';
-import { updateMyInfo, uploadProfileImage } from '@/libs/api/user';
+import { useRef, useState } from 'react'
+import CloseIcon from '@/assets/icons/ic_X.svg'
+import ProfileImg from '@/assets/imgs/img_default_profile.svg'
+import Button from '@/components/common/button'
+import Input from '@/components/common/input'
+import PasswordChangeModal from './passwordChangeModal'
+import { updateMyInfo, uploadProfileImage } from '@/libs/api/user'
 
 interface ProfileEditModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
   onUpdateUser?: (user: {
-    email: string;
-    nickname: string;
-    profileImageUrl?: string;
-  }) => void;
+    email: string
+    nickname: string
+    profileImageUrl?: string
+  }) => void
   user: {
-    email: string;
-    nickname: string;
-    imageUrl?: string;
-  };
+    email: string
+    nickname: string
+    imageUrl?: string
+  }
 }
 
 export default function ProfileEditModal({
@@ -28,144 +29,151 @@ export default function ProfileEditModal({
   onUpdateUser,
   user,
 }: ProfileEditModalProps) {
-  const [nickname, setNickname] = useState(user.nickname);
-  const [image, setImage] = useState<string | undefined>(user.imageUrl);
-  const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isImageDeleted, setIsImageDeleted] = useState(false);
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [nickname, setNickname] = useState(user.nickname)
+  const [image, setImage] = useState<string | undefined>(user.imageUrl)
+  const [previewImage, setPreviewImage] = useState<string | undefined>(
+    undefined,
+  )
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isImageDeleted, setIsImageDeleted] = useState(false)
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
+  const [nicknameError, setNicknameError] = useState('')
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
-  const profileText = nickname.trim().slice(0, 1) || user.nickname.slice(0, 1);
-  const displayImage = isImageDeleted ? undefined : previewImage || image;
+  const displayImage = isImageDeleted ? undefined : previewImage || image
 
   const handleClickImageChange = () => {
-    fileInputRef.current?.click();
-  };
+    fileInputRef.current?.click()
+  }
 
   const handleChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
 
-    if (!file) return;
+    if (!file) return
 
-    const previewUrl = URL.createObjectURL(file);
+    const previewUrl = URL.createObjectURL(file)
 
-    setPreviewImage(previewUrl);
-    setSelectedFile(file);
-    setIsImageDeleted(false);
+    setPreviewImage(previewUrl)
+    setSelectedFile(file)
+    setIsImageDeleted(false)
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = ''
     }
-    
+
     // API 연결 시 file을 FormData로 보내기
-    console.log(file);
+    console.log(file)
   }
 
   const handleDeleteImage = () => {
-    setPreviewImage(undefined);
-    setSelectedFile(null);
-    setIsImageDeleted(true);
+    setPreviewImage(undefined)
+    setSelectedFile(null)
+    setIsImageDeleted(true)
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = ''
     }
 
     // API 연결 시 imageUrl null 또는 빈 값으로 보내기
-    console.log('delete file');
+    console.log('delete file')
   }
 
   const handleCancel = () => {
-    setPreviewImage(undefined);
-    setSelectedFile(null);
-    setIsImageDeleted(false);
-    setNickname(user.nickname);
+    setPreviewImage(undefined)
+    setSelectedFile(null)
+    setIsImageDeleted(false)
+    setNickname(user.nickname)
+    setNicknameError('')
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = ''
     }
 
-    onClose();
+    onClose()
   }
 
   const handleSubmit = async () => {
+    if (nickname.trim().length > 10) {
+      setNicknameError('10자 이하로 변경 가능합니다')
+      return
+    }
+
     try {
-      let profileImageUrl = image;
+      let profileImageUrl = image
 
       // 이미지 업로드
       if (selectedFile) {
-        const formData = new FormData();
-        formData.append('image', selectedFile);
+        const formData = new FormData()
+        formData.append('image', selectedFile)
 
-        const imageData = await uploadProfileImage(formData);
-        profileImageUrl = imageData.profileImageUrl;
+        const imageData = await uploadProfileImage(formData)
+        profileImageUrl = imageData.profileImageUrl
+      }
+
+      const payload: {
+        nickname: string
+        profileImageUrl?: string | null
+      } = {
+        nickname,
+      }
+
+      if (selectedFile) {
+        payload.profileImageUrl = profileImageUrl
+      }
+
+      if (isImageDeleted) {
+        payload.profileImageUrl = null
       }
 
       // 프로필 수정
-      const updatedUser = await updateMyInfo({
-        nickname,
-        profileImageUrl: isImageDeleted ? null : profileImageUrl,
-      });
+      const updatedUser = await updateMyInfo(payload)
 
-      setNickname(updatedUser.nickname);
-      setImage(updatedUser.profileImageUrl || undefined);
-      setPreviewImage(undefined);
-      setSelectedFile(null);
-      setIsImageDeleted(false);
+      setNickname(updatedUser.nickname)
+      setImage(updatedUser.profileImageUrl || undefined)
+      setPreviewImage(undefined)
+      setSelectedFile(null)
+      setIsImageDeleted(false)
 
       onUpdateUser?.({
         ...updatedUser,
         profileImageUrl: updatedUser.profileImageUrl || undefined,
-      });
+      })
 
-      onClose();
+      onClose()
 
-      console.log('프로필 변경 완료', updatedUser);
+      window.location.reload()
     } catch (error) {
-      console.error('프로필 수정 실패', error);
+      console.error('프로필 수정 실패', error)
     }
-  };
+  }
 
   const handleOpenPasswordModal = () => {
-    setIsPasswordModalOpen(true);
+    setIsPasswordModalOpen(true)
   }
 
   return (
     <>
       {!isPasswordModalOpen && (
         <div
-          className="
-          fixed inset-0 z-50 flex bg-black/70
-          justify-end
-          md:items-center md:justify-center md:px-0
-          "
+          className="fixed inset-0 z-50 flex justify-end bg-black/70 md:items-center md:justify-center md:px-0"
           onClick={handleCancel}
         >
           <section
-            className="
-              relative h-full min-w-[300px]
-              border-1 border-gray-700
-              bg-modal
-              px-4 py-5
-
-              md:h-auto w-full md:max-w-[600px]
-              md:rounded-[16px] md:border md:border-gray-700
-              md:px-[30px] md:py-[30px]
-            "
+            className="bg-modal relative h-full w-full min-w-[300px] border-1 border-gray-700 px-4 py-5 md:h-auto md:max-w-[600px] md:rounded-[16px] md:border md:border-gray-700 md:px-[30px] md:py-[30px]"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
-              className="absolute right-5 top-5 md:right-[30px] md:top-[30px] cursor-pointer"
+              className="absolute top-5 right-5 cursor-pointer md:top-[30px] md:right-[30px]"
               onClick={handleCancel}
             >
               <CloseIcon className="size-6 text-gray-400" />
             </button>
 
-            <h2 className="mb-[30px] text-xl-20-bold text-gray-300 md:text-2xl-24-semibold">
+            <h2 className="text-xl-20-bold md:text-2xl-24-semibold mb-[30px] text-gray-300">
               프로필 변경
             </h2>
 
@@ -177,8 +185,8 @@ export default function ProfileEditModal({
                   className="size-[110px] shrink-0 rounded-full object-cover md:size-[120px]"
                 />
               ) : (
-                <div className='flex size-[110px] shrink-0 items-center justify-center rounded-full text-2xl-24-semibold bg-brand-300 md:size-[120px]'>
-                  {profileText}
+                <div className="text-2xl-24-semibold flex size-[110px] shrink-0 items-center justify-center rounded-full bg-white md:size-[120px]">
+                  <ProfileImg className="h-full w-full" />
                 </div>
               )}
 
@@ -194,7 +202,7 @@ export default function ProfileEditModal({
 
                 <button
                   type="button"
-                  className="cursor-pointer rounded-[180px] px-4 py-[8.5px] text-lg-16-semibold border text-lg-16-semibold border-red-500 bg-transparent text-red-500 hover:bg-black/20"
+                  className="text-lg-16-semibold text-lg-16-semibold cursor-pointer rounded-[180px] border border-red-500 bg-transparent px-4 py-[8.5px] text-red-500 hover:bg-black/20"
                   onClick={handleDeleteImage}
                 >
                   사진 삭제
@@ -203,33 +211,49 @@ export default function ProfileEditModal({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept='image/*'
-                  className='hidden'
+                  accept="image/*"
+                  className="hidden"
                   onChange={handleChangeImage}
                 />
               </div>
             </div>
 
             <div className="mb-6 md:mb-[30px]">
-              <p className="mb-[10px] text-lg-14-semibold md:text-lg-16-semibold text-gray-300 md:mb-3">
+              <p className="text-lg-14-semibold md:text-lg-16-semibold mb-[10px] text-gray-300 md:mb-3">
                 이메일
               </p>
-              <Input value={user.email} disabled className="h-12 text-gray-400" />
+              <Input
+                value={user.email}
+                disabled
+                className="h-12 text-gray-400"
+              />
             </div>
 
             <div className="mb-6">
-              <p className="mb-[10px] text-lg-14-semibold md:text-lg-16-semibold text-gray-300 md:mb-3">
+              <p className="text-lg-14-semibold md:text-lg-16-semibold mb-[10px] text-gray-300 md:mb-3">
                 닉네임
               </p>
               <Input
                 value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
                 className="h-12"
+                onChange={(e) => {
+                  setNickname(e.target.value)
+
+                  if (nicknameError) {
+                    setNicknameError('')
+                  }
+                }}
               />
+
+              {nicknameError && (
+                <p className="mt-2 ml-1 text-xs text-red-500">
+                  {nicknameError}
+                </p>
+              )}
             </div>
 
             <div className="mb-[30px]">
-              <p className="mb-[10px] text-lg-14-semibold md:text-lg-16-semibold text-gray-300 md:mb-3">
+              <p className="text-lg-14-semibold md:text-lg-16-semibold mb-[10px] text-gray-300 md:mb-3">
                 비밀번호
               </p>
               <Button
@@ -242,7 +266,7 @@ export default function ProfileEditModal({
               </Button>
             </div>
 
-            <div className="absolute bottom-5 left-4 right-4 flex gap-3 md:static md:gap-4 h-[50px] leading-2 md:h-15">
+            <div className="absolute right-4 bottom-5 left-4 flex h-[50px] gap-3 leading-2 md:static md:h-15 md:gap-4">
               <Button
                 type="button"
                 size="md"
@@ -270,10 +294,10 @@ export default function ProfileEditModal({
         isOpen={isPasswordModalOpen}
         onClose={() => {
           setIsPasswordModalOpen(false)
-          onClose();
+          onClose()
         }}
         onBack={() => setIsPasswordModalOpen(false)}
       />
     </>
-  );
+  )
 }
