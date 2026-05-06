@@ -378,7 +378,7 @@ export default function DashboardClient({
           members={members}
           onClose={() => setSelectedTask(null)}
           onRequestDelete={handleRequestDeleteCard}
-          isDashboardOwnder
+          isDashboardOwner={false}
         />
       )}
 

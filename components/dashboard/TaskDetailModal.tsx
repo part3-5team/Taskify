@@ -42,7 +42,7 @@ interface TaskDetailModalProps {
   members: Member[]
   onClose: () => void
   onRequestDelete?: (cardId: number) => void
-  isDashboardOwnder?: boolean
+  isDashboardOwner?: boolean
 }
 
 export default function TaskDetailModal({
@@ -53,7 +53,7 @@ export default function TaskDetailModal({
   members,
   onClose,
   onRequestDelete,
-  isDashboardOwnder,
+  isDashboardOwner,
 }: TaskDetailModalProps) {
   const [card, setCard] = useState<CardDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -385,7 +385,7 @@ export default function TaskDetailModal({
               const isLastComment = idx === comments.length - 1
               const isMyComment = myInfo?.id === comment.author.id
               const canEditComment = isMyComment
-              const canDeleteComment = isMyComment || isDashboardOwnder
+              const canDeleteComment = isMyComment || isDashboardOwner
 
               return (
                 <div
