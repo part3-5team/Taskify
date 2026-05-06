@@ -134,6 +134,27 @@
 
 body {
   font-family: var(--font-sans);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-black-200) var(--color-bg);
+}
+
+/* Custom Scrollbar for Webkit */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-black-200);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-black-100);
 }
 
 /* =========================================
