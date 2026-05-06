@@ -15,7 +15,7 @@ const Title = () => (
     <br />
     <Link href="/tetris">
       <span className="text-md-14-medium text-gray-400 hover:text-gray-100">
-        테트리스 하러 가기
+        정말 가실건가요? 테트리스 한 판만 해봐요👈🥹
       </span>
     </Link>
   </h2>
