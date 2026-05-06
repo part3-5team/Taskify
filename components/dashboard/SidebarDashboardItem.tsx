@@ -26,7 +26,7 @@ export default function SidebarDashboardItem({
           className="h-5 w-5 shrink-0"
           style={{ color: color ?? 'currentColor' }}
         />
-        {label}
+        <span className="max-w-[150px] truncate">{label}</span>
         {createdByMe && <IconCrown className="text-brand-600 shrink-0" />}
       </Link>
     </li>
