@@ -17,6 +17,23 @@ interface TaskCardProps {
   onClick?: () => void
 }
 
+function getTagColorClasses(label: string) {
+  if (label === '프로젝트') return 'bg-profile-blue text-white'
+  if (label === '일정') return 'bg-profile-yellow text-white'
+  if (label === '공부') return 'bg-profile-cyan text-white'
+  if (label === '버그') return 'bg-red-500 text-white'
+
+  const colors = [
+    'bg-profile-rose text-white',
+    'bg-profile-orange text-white',
+    'bg-profile-violet text-white',
+    'bg-brand-500 text-white',
+    'bg-profile-green text-white',
+  ]
+  const index = label.length % colors.length
+  return colors[index]
+}
+
 export default function TaskCard({
   id,
   title,
@@ -117,13 +134,7 @@ export default function TaskCard({
       {tags.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-1.5">
           {tags.map((tag, idx) => {
-            let colorClasses = 'bg-brand-500 text-white'
-
-            if (tag === '프로젝트') colorClasses = 'bg-profile-blue text-white'
-            else if (tag === '일정')
-              colorClasses = 'bg-profile-yellow text-white'
-            else if (tag === '공부') colorClasses = 'bg-profile-cyan text-white'
-            else if (tag === '버그') colorClasses = 'bg-red-500 text-white'
+            const colorClasses = getTagColorClasses(tag)
 
             return (
               <span
