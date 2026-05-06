@@ -37,6 +37,7 @@ export default function ProfileEditModal({
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isImageDeleted, setIsImageDeleted] = useState(false)
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
+  const [nicknameError, setNicknameError] = useState('')
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -85,6 +86,7 @@ export default function ProfileEditModal({
     setSelectedFile(null)
     setIsImageDeleted(false)
     setNickname(user.nickname)
+    setNicknameError('')
 
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -94,6 +96,11 @@ export default function ProfileEditModal({
   }
 
   const handleSubmit = async () => {
+    if (nickname.trim().length > 10) {
+      setNicknameError('10자 이하로 변경 가능합니다')
+      return
+    }
+
     try {
       let profileImageUrl = image
 
@@ -228,9 +235,21 @@ export default function ProfileEditModal({
               </p>
               <Input
                 value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
                 className="h-12"
+                onChange={(e) => {
+                  setNickname(e.target.value)
+
+                  if (nicknameError) {
+                    setNicknameError('')
+                  }
+                }}
               />
+
+              {nicknameError && (
+                <p className="mt-2 ml-1 text-xs text-red-500">
+                  {nicknameError}
+                </p>
+              )}
             </div>
 
             <div className="mb-[30px]">
