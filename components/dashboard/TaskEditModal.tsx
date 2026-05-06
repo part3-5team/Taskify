@@ -106,10 +106,16 @@ export default function TaskEditModal({
   }
 
   function getTagColorClasses(label: string) {
-    if (label === '프로젝트') return 'bg-profile-blue text-white'
-    if (label === '일정') return 'bg-profile-yellow text-white'
-    if (label === '공부') return 'bg-profile-cyan text-white'
-    if (label === '버그') return 'bg-red-500 text-white'
+    const fixedColors: Record<string, string> = {
+      프로젝트: 'bg-profile-blue text-white',
+      일정: 'bg-profile-yellow text-white',
+      공부: 'bg-profile-cyan text-white',
+      버그: 'bg-red-500 text-white',
+    }
+
+    if (fixedColors[label]) {
+      return fixedColors[label]
+    }
 
     const colors = [
       'bg-profile-rose text-white',
@@ -118,8 +124,12 @@ export default function TaskEditModal({
       'bg-brand-500 text-white',
       'bg-profile-green text-white',
     ]
-    const index = label.length % colors.length
-    return colors[index]
+
+    const hash = Array.from(label).reduce((acc, char) => {
+      return acc + char.charCodeAt(0)
+    }, 0)
+
+    return colors[hash % colors.length]
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,7 +153,7 @@ export default function TaskEditModal({
   return (
     <ModalLayout
       onClose={onClose}
-      className="bg-modal flex min-h-screen w-full flex-col rounded-none border-none p-7 text-left md:w-[500px] md:rounded-2xl"
+      className="flex h-dvh w-screen max-w-none flex-col overflow-hidden rounded-none p-7 text-left md:h-auto md:max-h-[90vh] md:w-full md:max-w-[500px] md:rounded-2xl"
     >
       {/* 헤더 */}
       <div className="mb-8 flex items-center justify-between">
