@@ -143,7 +143,7 @@ export default function TaskEditModal({
   return (
     <ModalLayout
       onClose={onClose}
-      className="bg-modal w-ful flex max-h-[90%] flex-col rounded-none border-none p-7 text-left md:w-[500px] md:rounded-2xl"
+      className="bg-modal flex min-h-screen w-full flex-col rounded-none border-none p-7 text-left md:w-[500px] md:rounded-2xl"
     >
       {/* 헤더 */}
       <div className="mb-8 flex items-center justify-between">
