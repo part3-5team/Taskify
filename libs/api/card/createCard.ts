@@ -13,6 +13,9 @@ export const createCard = async (
     const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')?.value
 
+    if (!token)
+      return { success: false, data: null, error: '세션이 만료되었습니다.' }
+
     const response = await fetch(`${BASE_URL}/cards`, {
       method: 'POST',
       headers: {
